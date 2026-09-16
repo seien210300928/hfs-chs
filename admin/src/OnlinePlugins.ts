@@ -28,12 +28,12 @@ export default function OnlinePlugins() {
             onChange: setSearch as any,
             start: h(Search),
             typing: true,
-            label: "Search text"
+            label: "搜索文本"
         }),
         h(DataTable, {
             error: error && err2msg(xlate(error, PLUGIN_ERRORS)),
             rows: list.length ? list : [], // workaround for DataGrid bug causing 'no rows' message to be not displayed after 'loading' was also used
-            noRows: "No compatible plugins have been found",
+            noRows: "未找到兼容的插件",
             fillFlex: true,
             initializing,
             columnVisibilityModel: snap.onlinePluginsColumns,
@@ -41,7 +41,7 @@ export default function OnlinePlugins() {
             columns: [
                 {
                     field: 'id',
-                    headerName: "name",
+                    headerName: "名称",
                     flex: 1,
                     renderCell: renderName,
                     mergeRender: { description: { sx: { fontSize: 'x-small' } } },
@@ -52,7 +52,7 @@ export default function OnlinePlugins() {
                 },
                 {
                     field: 'pushed_at',
-                    headerName: "last update",
+                    headerName: "最后更新",
                     valueGetter: (value) => new Date(value).toLocaleDateString(),
                 },
                 {
@@ -68,7 +68,7 @@ export default function OnlinePlugins() {
                 {
                     field: 'stargazers_count',
                     width: 50,
-                    headerName: "stars",
+                    headerName: "星标",
                     align: 'center',
                     hideUnder: 'sm',
                 },
@@ -76,9 +76,9 @@ export default function OnlinePlugins() {
             actions: ({ row, id }) => [
                 h(IconBtn, {
                     icon: Download,
-                    title: "Install",
+                    title: "安装",
                     progress: row.downloading,
-                    disabled: row.installed && "Already installed",
+                    disabled: row.installed && "已安装",
                     tooltipProps: { placement:'bottom-end' }, // workaround problem with horizontal scrolling by moving the tooltip leftward
                     onClick: () => installPluginFromResult(row)
                 }),
@@ -113,15 +113,15 @@ export async function installPluginFromResult(row: any) {
         if (!await confirmDialog(
             h(Flex, { vert: true, alignItems: 'center' },
                 h(Warning, { color: 'warning', fontSize: 'large' }),
-                "Proceed only if you trust this plugin",
-                h(Box, { sx: { fontSize: '60%' } }, "A plugin has the same power of any other software"),
+                "仅在您信任此插件时才继续",
+                h(Box, { sx: { fontSize: '60%' } }, "插件与任何其他软件具有同等的权限"),
             ))) return
-    if (row.missing && !await confirmDialog("This will also install: " + _.map(row.missing, 'repo').join(', '))) return
+    if (row.missing && !await confirmDialog("同时还会安装: " + _.map(row.missing, 'repo').join(', '))) return
     const branch = row.branch || row.default_branch
     return installPlugin(row.id, branch).catch((e: any) => {
         if (e.code !== HTTP_FAILED_DEPENDENCY)
             return alertDialog(e)
-        const msg = h(Fragment, {}, "This plugin has some dependencies unmet:",
+        const msg = h(Fragment, {}, "此插件存在未满足的依赖项:",
             e.data.map((x: any) => h('li', { key: x.repo }, x.repo + ': ' + x.error)) )
         return alertDialog(msg, 'error')
     })
@@ -130,7 +130,7 @@ export async function installPluginFromResult(row: any) {
 async function installPlugin(id: string, branch?: string): Promise<any> {
     try {
         const res = await apiCall('download_plugin', { id, branch, stop: true }, { timeout: false })
-        if (await confirmDialog(`Plugin ${id} downloaded`, { trueText: "Start" }))
+        if (await confirmDialog(`插件 ${id} 已下载`, { trueText: "启动" }))
             await startPlugin(res.id)
     }
     catch(e:any) {
@@ -138,7 +138,7 @@ async function installPlugin(id: string, branch?: string): Promise<any> {
         if (e.code === HTTP_FAILED_DEPENDENCY) // try to install automatically
             for (const x of e.cause)
                 if (x.error === 'missing') {
-                    toast("Installing dependency: " + x.repo)
+                    toast("正在安装依赖: " + x.repo)
                     await installPlugin(x.repo)
                     done = true
                 }

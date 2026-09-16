@@ -17,12 +17,12 @@ export default function FileField({ value, onChange, files=true, folders=false, 
         wrap: true,
         end: h(IconBtn, {
             icon: Eject,
-            title: "Browse files...",
+            title: "浏览文件...",
             edge: 'end',
             sx: { mb: .5 },
             onClick() {
                 const { close } = newDialog({
-                    title: title ?? ((files ? "Pick a file" : "Pick a folder") + prefix(': ', fileMask)),
+                    title: title ?? ((files ? "选择文件" : "选择文件夹") + prefix(': ', fileMask)),
                     dialogProps: {
                         fullScreen: !large,
                         sx: { minWidth: 'min(90vw, 40em)', minHeight: 'calc(100vh - 9em)' }

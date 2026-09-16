@@ -1,6 +1,6 @@
 import { DataGrid, DataGridProps, getGridStringOperators, GridColDef, GridFooter, GridFooterContainer,
     GridValidRowModel, useGridApiRef, GridRenderCellParams, QuickFilter, QuickFilterControl } from '@mui/x-data-grid'
-import { enUS } from '@mui/x-data-grid/locales'
+import { zhCN } from '@mui/x-data-grid/locales'
 import { Alert, Box, BoxProps, LinearProgress, useTheme } from '@mui/material'
 import type { Breakpoint } from '@mui/material/styles'
 import { createElement as h, type ElementType, Fragment, ReactNode, type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -47,7 +47,7 @@ export function DataTable({
     const [quickFilterOpen, setQuickFilterOpen] = useState(false)
     const [merged, setMerged] = useState(0)
     const manipulatedColumns = useMemo(() => {
-        const { localeText } = enUS.components.MuiDataGrid.defaultProps as any
+        const { localeText } = zhCN.components.MuiDataGrid.defaultProps as any
         const ret = onlyTruthy(columns.map(col => {
             if (!col) return
             const { type, sx } = col
@@ -61,7 +61,7 @@ export function DataTable({
                             const res = op.getApplyFilterFn(item, col)
                             return res && _.negate(res)
                         },
-                        label: "(not) " + (localeText['filterOperator' + _.upperFirst(op.value)] || op.value)
+                        label: "非" + (localeText['filterOperator' + _.upperFirst(op.value)] || op.value)
                     } satisfies typeof op
                 ])
             if (!col.mergeRender && !col.sx)
@@ -173,7 +173,7 @@ export function DataTable({
                 footer: { ...(slotProps as any)?.footer, add: wrappedFooterSide },
                 noRowsOverlay: { ...(slotProps as any)?.noRowsOverlay, initializing, noRows },
                 pagination: {
-                    labelRowsPerPage: "Rows",
+                    labelRowsPerPage: "每页行数",
                     ...!causingScrolling && {
                         showFirstButton: true,
                         showLastButton: true,
@@ -189,7 +189,7 @@ export function DataTable({
                     !x.dialogHidden && (x.renderCell || x.valueGetter || x.field === ACTIONS || row[x.field] !== undefined))
                 if (showInDialog.length <= visibleInList) return // no need for dialog
                 newDialog({
-                    title: "Details",
+                    title: "详情",
                     onClose() {
                         displayingDetails.current = {}
                     },
@@ -238,7 +238,7 @@ export function DataTable({
     function renderActionsHeader(params: any) {
         return h(Box, { sx: { display: 'flex', width: '100%', justifyContent: 'center' }, onClick: stopPropagation, onKeyDown: stopPropagation },
             actionsHeader !== undefined ? callable(actionsHeader, params) : actionsProps?.renderHeader?.(params),
-            quickFilter && h(IconBtn, { icon: Search, title: "Search", size: 'small', onClick: () => setQuickFilterOpen(true) }))
+            quickFilter && h(IconBtn, { icon: Search, title: "搜索", size: 'small', onClick: () => setQuickFilterOpen(true) }))
 
         function stopPropagation(ev: SyntheticEvent) {
             // prevent header controls from triggering grid sorting or column interactions
@@ -280,7 +280,7 @@ function DataTableQuickFilterToolbar({ onExpandedChange }: {
         }
     },
         h(QuickFilter, { expanded: true, debounceMs: 300, onExpandedChange },
-            h(QuickFilterControl as ElementType, { fullWidth: true, inputRef, size: 'small', placeholder: "Search" })))
+            h(QuickFilterControl as ElementType, { fullWidth: true, inputRef, size: 'small', placeholder: "搜索" })))
 }
 
 function CustomFooter({ add, ...props }: { add?: ReactNode }) {
@@ -288,7 +288,7 @@ function CustomFooter({ add, ...props }: { add?: ReactNode }) {
 }
 
 function NoRowsOverlay({ initializing, noRows }: { initializing?: boolean, noRows?: ReactNode }) {
-    return initializing ? null : h(Center, {}, noRows || "No entries")
+    return initializing ? null : h(Center, {}, noRows || "无记录")
 }
 
 // required in case of fillFlex:true

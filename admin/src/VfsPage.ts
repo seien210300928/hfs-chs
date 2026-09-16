@@ -63,25 +63,25 @@ export default function VfsPage({ setTitleSide }: PageProps) {
     const nothingShared = data && !data.root?.children?.length && !data.root?.source
     const hintElement = useMemo(() => nothingShared ? h(Alert, {
         severity: 'warning',
-        children: h(Fragment, {}, "Add something to your virtual file system — click the ", h(Add), "button, or set a source for the Home folder"),
+        children: h(Fragment, {}, "向虚拟文件系统添加内容 — 点击 ", h(Add), " 按钮，或为主页文件夹设置来源"),
     }) : urls?.length > 0 && h(Alert, {
         severity: 'info',
         children: [
-            "Your shared files can be browsed from ",
+            "您的共享文件可从以下地址浏览 ",
             h('span', { className: HIDE_IN_TESTS, key: 0 },
                 reactJoin(" or ", urls.slice(0,3).map(href => h(Link, { href, target: 'frontend' }, href))) )
         ]
     }), [nothingShared, urls])
 
     setTitleSide(useMemo(() => h(Box, { sx: { display: { xs: 'none', md: 'block' }  } },
-        h(Alert, { severity: 'info' }, "This is what your users will see. Edit it freely – files on disk won’t be changed."),
+        h(Alert, { severity: 'info' }, "这是您的用户将看到的内容。可随意编辑——磁盘上的文件不会被更改。"),
         hintElement,
     ), [hintElement]))
 
     const single = selectedFiles?.length < 2 && selectedFiles[0] as VfsNodeAdmin
     const sideContent = useMemo(() => !vfs ? null
         : diskContent.enabled ? diskContent.element || h(Box, {},
-            h(Box, { sx: { fontSize: 'xx-large', wordBreak: 'break-all' } }, "From ", vfsShowDiskContentFor),
+            h(Box, { sx: { fontSize: 'xx-large', wordBreak: 'break-all' } }, "来自 ", vfsShowDiskContentFor),
             h(List, { dense: true },
                 diskContent.list.map(it =>
                     h(ListItem, { key: it.n, sx: { borderTop: '1px solid #8888' } }, h(ListLsItem, { it })))
@@ -99,8 +99,8 @@ export default function VfsPage({ setTitleSide }: PageProps) {
         : !selectedFiles.length ? null
         : h(Fragment, {},
             h(Flex, {},
-                h(Typography, {variant: 'h6'}, selectedFiles.length + ' selected'),
-                h(Button, { onClick: deleteFiles, startIcon: h(Delete) }, "Remove"),
+                h(Typography, {variant: 'h6'}, selectedFiles.length + ' 个已选'),
+                h(Button, { onClick: deleteFiles, startIcon: h(Delete) }, "移除"),
             ),
             h(List, { dense: true, disablePadding: true },
                 selectedFiles.map(f => h(ListItem, { key: f.id },
@@ -120,12 +120,12 @@ export default function VfsPage({ setTitleSide }: PageProps) {
             }
         }
         const { close } = newDialog({
-            title: vfsShowDiskContentFor ? "Disk content"
-                : selectedFiles.length > 1 ? "Multiple selection" :
+            title: vfsShowDiskContentFor ? "磁盘内容"
+                : selectedFiles.length > 1 ? "多选" :
                 h(Flex, {},
                     vfsNodeIcon(selectedFiles[0] as VfsNodeAdmin),
                     h(Flex, { flexWrap: 'wrap', gap: '0 0.5em' },
-                        selectedFiles[0].name || "Home",
+                        selectedFiles[0].name || "主页",
                         h(Box, { component: 'span', sx: { color: 'text.secondary' } } as any, ancestors.join(' /'))
                     )
                 ),
@@ -254,7 +254,7 @@ async function deleteFiles() {
     const f = state.selectedFiles
     if (!f.length) return
     deleteVfs(f.map(x => x.id))
-    toast(`${f.length} item(s) deleted`, 'success')
+    toast(`${f.length} 个条目已删除`, 'success')
 }
 
 export function deleteVfs(uris: string[]) {

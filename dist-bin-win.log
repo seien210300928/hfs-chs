@@ -1,0 +1,15 @@
+
+> hfs@3.2.2 dist-bin-win
+> cd dist && pkg . --public -C gzip -t node24-win-x64 && npx resedit-cli --in hfs.exe --icon 1,../hfs.ico --out hfs.exe && zip hfs-windows-x64-$(jq -r .version ../package.json).zip hfs.exe -r plugins && cd ..
+
+> pkg@6.20.0
+> compression: GZip
+> Fetching base Node.js binaries to PKG_CACHE_PATH
+
+> [31mError![39m Network error during fetch: request to https://github.com/yao-pkg/pkg-fetch/releases/download/v3.6/node-v24.15.0-win-x64 failed, reason: Client network socket disconnected before secure TLS connection was established
+> Not found in remote cache:
+  {"tag":"v3.6","name":"node-v24.15.0-win-x64"}
+> Building base binary from source:
+  built-v24.15.0-win-x64
+> Fetching Node.js source archive from nodejs.org...
+

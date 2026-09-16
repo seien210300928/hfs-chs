@@ -15,26 +15,26 @@ export default function LogoutPage() {
     if (element)
         return element
     return h(Box, { sx: { display: 'flex', flexDirection:'column', alignItems: 'flex-start', gap: 2 } },
-        !username ? h(Alert, { severity: 'info' }, "You are not logged in, because authentication is not required on localhost")
+        !username ? h(Alert, { severity: 'info' }, "您未登录，因为 localhost 无需身份验证")
             : h(Fragment, {},
-                "You are logged in as: " + username,
+                "当前登录用户：" + username,
                 h(Btn, {
                     icon: Logout,
                     size: 'large',
                     onClick: () => apiCall('logout').catch(err => // we expect 401
                             err.code !== HTTP_UNAUTHORIZED && alertDialog(err))
-                }, "I want to logout")
+                }, "我要退出登录")
             ),
         h(Btn, {
             icon: PowerSettingsNew,
             size: 'large',
             color: 'warning',
-            confirm: "Stopping the server, this interface won't respond anymore",
+            confirm: "停止服务器后，此界面将不再响应",
             async onClick() {
                 await apiCall('quit')
-                await alertDialog("Good-bye", 'success')
+                await alertDialog("再见", 'success')
                 location.reload()
             },
-        }, "Quit HFS")
+        }, "退出 HFS")
     )
 }

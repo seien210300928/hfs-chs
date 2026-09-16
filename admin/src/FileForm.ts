@@ -70,7 +70,7 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, saved
     const barColors = useDialogBarColors()
     const { movingFile } = useSnapState()
 
-    const needSourceWarning = !hasSource && h(Box as any, { sx: { color: 'warning.main' }, component: 'span' }, "Works only on folders with disk source! ")
+    const needSourceWarning = !hasSource && h(Box as any, { sx: { color: 'warning.main' }, component: 'span' }, "仅对具有磁盘源的文件夹生效！ ")
     const show: Record<keyof VfsPerms, boolean> = {
         can_read: !isLink,
         can_see: true,
@@ -96,15 +96,15 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, saved
         barSx: { gap: 2, width: '100%', ...barColors },
         stickyBar: true,
         addToBar: [
-            isDir && !isSideBreakpoint && h(AddVfsBtn, { variant: 'outlined' }, "Add"),
+            isDir && !isSideBreakpoint && h(AddVfsBtn, { variant: 'outlined' }, "添加"),
             h(IconBtn, {
                 icon: ContentCut,
                 disabled: isRoot || movingFile === file.id,
-                title: "Cut (you can also use drag & drop to move items)",
-                'aria-label': "Cut",
+                title: "剪切（也可以拖放来移动条目）",
+                'aria-label': "剪切",
                 onClick() {
                     state.movingFile = file.id
-                    alertDialog(h(Box, {}, "Now that this is marked for moving, click on the destination folder, and then the paste button ", h(ContentPaste)), 'info')
+                    alertDialog(h(Box, {}, "现在已标记为待移动，请点击目标文件夹，然后再点击粘贴按钮 ", h(ContentPaste)), 'info')
                 },
             }),
             movingFile && h(IconBtn, {
@@ -120,7 +120,7 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, saved
             }),
             h(IconBtn, {
                 icon: Delete,
-                title: "Delete",
+                title: "删除",
                 disabled: isRoot,
                 onClick() {
                     deleteVfs([file.id])
@@ -132,12 +132,12 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, saved
         onError: alertDialog,
         save: {
             ...propsForModifiedValues(isModifiedConfig(values, rest)),
-            children: "Apply",
+            children: "应用",
             startIcon: h(Check),
             async onClick() {
                 const node = state.selectedFiles[0] || id2vfsNode.get(values.id)
                 if (!node)
-                    throw Error("Selected node not found")
+                    throw Error("未找到所选节点")
                 const props = _.omit(values, ['birthtime','mtime','size','id'])
                 const wasId = node.id
                 prepareVfsUndo()
@@ -151,24 +151,24 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, saved
             }
         },
         fields: [
-            isRoot ? h(Alert, { severity: 'info' }, "This is the Home folder, the root of your shared files. Options set here will be applied to all files.")
-                : isDir && hasSource && h(Alert, { severity: 'info' }, `To set permissions on individual items in folder, add them by clicking Add button, and then "from disk"`),
+            isRoot ? h(Alert, { severity: 'info' }, "这是主页文件夹，即您共享文件的根目录。此处设置的选项将应用于所有文件。")
+                : isDir && hasSource && h(Alert, { severity: 'info' }, `要为文件夹中的单个条目设置权限，请点击“添加”按钮，然后选择“来自磁盘的文件或文件夹”`),
             {
-                k: 'name', required: true, xl: true, helperText: hasSource && "You can decide a name that's different from the one on your disk",
-                ...isRoot && { disabled: true, value: "Home folder" },
+                k: 'name', required: true, xl: true, helperText: hasSource && "您可以指定一个与磁盘上不同的名称",
+                ...isRoot && { disabled: true, value: "主页文件夹" },
                 end: nameFromSource && !nameIsDerivedFromSource && h(Btn, {
-                    icon: RestartAlt, title: "Reset to same name on disk",
+                    icon: RestartAlt, title: "恢复为磁盘上的同名",
                     onClick: () => setValues({ ...values, name: nameFromSource })
                 }),
             },
-            isLink ? { k: 'url', label: "URL", lg: 12, xl: 8, required: true }
-                : { k: 'source', label: "Disk source", xl: true, comp: FileField, files: isUnknown || !isDir, folders: isUnknown || isDir,
-                    placeholder: "none",
-                    helperText: !values.source ? "If you enter a path here, its content will be listed. Leaving this empty, makes this folder fully virtual."
-                        : isDir ? "Files from this path on disk will be listed, but you can add more" : undefined,
+            isLink ? { k: 'url', label: "网址", lg: 12, xl: 8, required: true }
+                : { k: 'source', label: "磁盘源", xl: true, comp: FileField, files: isUnknown || !isDir, folders: isUnknown || isDir,
+                    placeholder: "无",
+                    helperText: !values.source ? "如果在此输入路径，其内容将被列出。留空则此文件夹完全虚拟。"
+                        : isDir ? "将列出磁盘上此路径的文件，但您还可以添加更多" : undefined,
             },
             { k: 'id', comp: LinkField, statusApi, xs: 12 },
-            { k: 'order', comp: NumberField, min: -1E5, max: 1E5, label: "Priority (order in the frontend)", placeholder: 'default', sm: 4, helperText: wikiLink('Virtual-file-system#order', "To force position") },
+            { k: 'order', comp: NumberField, min: -1E5, max: 1E5, label: "优先级（前端中的顺序）", placeholder: '默认', sm: 4, helperText: wikiLink('Virtual-file-system#order', "用于强制排序位置") },
             {
                 k: 'iconType',
                 comp: SelectField,
@@ -183,41 +183,41 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, saved
                     comp: SelectField, // uniqBy to avoid same icon (with different names), but it works only on array, so first step is to convert the object
                     options: _.map(_.uniqBy(_.map(SYS_ICONS, (v,k) => [k, v[0], v[1] ?? k] as const), x => x[2]), ([k, emoji]) =>
                         ({ value: k, label: h(Flex, { gap: '.5em' }, hIcon(k), hIcon(emoji), ' ', k) }) ), // show both font-icon and emoji versions
-                    helperText: "The second icon is the fallback"
+                    helperText: "第二个图标为备用图标"
                 } : {
-                    label: "Icon file", placeholder: "default", comp: FileField, fileMask: IMAGE_FILEMASK,
+                    label: "图标文件", placeholder: "默认", comp: FileField, fileMask: IMAGE_FILEMASK,
                 }
             },
-            perm('can_read', "Who can see but not download will be asked to log in"),
-            perm('can_archive', "Should this be included when user downloads as ZIP"),
-            perm('can_list', "Permission to request the list of a folder. The list will include only things you can see.", { contentText: "subfolders" }),
-            perm('can_delete', [needSourceWarning, "Those who can delete can also rename and cut/move"]),
-            perm('can_upload', needSourceWarning, { contentText: "subfolders" }),
-            perm('can_see', ["See this item in the list. ", wikiLink('Permissions', "More help.")]),
+            perm('can_read', "能看见但不能下载的用户将被要求登录"),
+            perm('can_archive', "用户以 ZIP 下载时是否包含此条目"),
+            perm('can_list', "请求文件夹列表的权限。列表将只包含您能看见的内容。", { contentText: "子文件夹" }),
+            perm('can_delete', [needSourceWarning, "能删除的用户也可以重命名和剪切/移动"]),
+            perm('can_upload', needSourceWarning, { contentText: "子文件夹" }),
+            perm('can_see', ["在列表中可见该条目。 ", wikiLink('Permissions', "更多帮助。")]),
             isLink && {
                 k: 'target',
                 comp: BoolField,
                 sm: true,
-                label: "Open in new browser",
+                label: "在新浏览器中打开",
                 fromField: x => x ? '_blank' : null,
                 toField: x => x > '',
             },
             showSize && { k: 'size', comp: DisplayField, sm: 6, lg: 4, toField: formatBytes },
-            showTimestamps && { k: 'birthtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "Created", toField: formatTimestamp },
-            showTimestamps && { k: 'mtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "Modified", toField: formatTimestamp },
-            showAccept && { k: 'accept', label: "Accept on upload", placeholder: "anything", xl: showWebsite ? 4 : 12,
-                helperText: h('span', {}, "Not enforced, just hinting the browser. ", h(Link, { href: ACCEPT_LINK, target: '_blank' }, "Example: .zip")) },
+            showTimestamps && { k: 'birthtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "创建时间", toField: formatTimestamp },
+            showTimestamps && { k: 'mtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "修改时间", toField: formatTimestamp },
+            showAccept && { k: 'accept', label: "上传时接受", placeholder: "任意", xl: showWebsite ? 4 : 12,
+                helperText: h('span', {}, "仅提示浏览器，并不强制。 ", h(Link, { href: ACCEPT_LINK, target: '_blank' }, "示例: .zip")) },
             showWebsite && { k: 'default', comp: BoolField, xl: showAccept ? 8 : 12,
-                label: "Serve as web-page if index.html is found" + (inheritedDefault && values.default == null ? ' (inherited)' : ''),
+                label: "若找到 index.html 则作为网页提供" + (inheritedDefault && values.default == null ? '（继承）' : ''),
                 value: values.default ?? inheritedDefault,
                 toField: Boolean, fromField: (v:boolean) => v && !inheritedDefault ? 'index.html' : v ? null : false,
-                helperText: md("...instead of showing list of files")
+                helperText: md("...而不是显示文件列表")
             },
             { k: 'comment', multiline: true, xl: true },
             isDir && { k: 'masks', multiline: true, xl: 6,
                 toField: yaml.stringify, fromField: v => v ? yaml.parse(v) : undefined,
                 comp: TextEditorField, lang: 'yaml',
-                helperText: ["Special field, leave empty unless you know what you are doing. YAML syntax. ", wikiLink('Masks-field', "(examples)")]
+                helperText: ["特殊字段，除非您清楚自己在做什么，否则请留空。YAML 语法。 ", wikiLink('Masks-field', "（示例）")]
             },
         ]
     })
@@ -238,7 +238,7 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, saved
             k: perm, sm: 6, lg: 12, xl: 4,
             parent, accountsApi, helperText, isDir,
             otherPerms: others.map(x => ({ value: x, label: who2desc(x) })),
-            label: "Who can " + perm2word(perm),
+            label: "谁可以 " + perm2word(perm),
             inherit,
             byMasks: byMasks?.[perm],
             offerInheritance: true,
@@ -250,7 +250,7 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, saved
 }
 
 function perm2word(perm: string) {
-    return xlate(perm.split('_')[1], { read: 'download', archive: 'zip', list: 'access list' })
+    return xlate(perm.split('_')[1], { read: '下载', archive: '压缩', list: '访问列表' })
 }
 
 type AccountsApi = ReturnType<typeof useAccountsApi>
@@ -271,9 +271,9 @@ interface WhoFieldProps extends FieldProps<WhoVfs | undefined> {
     contentText?: string
 }
 export function WhoField({ value, onChange, parent, inherit, accountsApi, helperText, otherPerms, byMasks,
-        hideValues, isChildren, isDir, contentText="folder content", setApi, offerInheritance, ...rest }: WhoFieldProps): ReactElement {
+        hideValues, isChildren, isDir, contentText="文件夹内容", setApi, offerInheritance, ...rest }: WhoFieldProps): ReactElement {
     const defaultLabel = who2desc(byMasks ?? inherit)
-        + prefix(' (', byMasks !== undefined ? "from masks" : parent !== undefined ? "as parent folder" : "default", ')')
+        + prefix(' (', byMasks !== undefined ? "来自掩码" : parent !== undefined ? "与父文件夹相同" : "默认", ')')
     const objectMode = isWhoObject(value)
     const thisValue = objectMode ? value.this : value
     accountsApi ??= useAccountsApi() // it's important that the "accounts" prop is stable in the truthy sense
@@ -287,7 +287,7 @@ export function WhoField({ value, onChange, parent, inherit, accountsApi, helper
             { value: WHO_ADMIN },
             { value: WHO_ANYONE },
             ...otherPerms || [],
-            { value: [], label: "Select accounts" },
+            { value: [], label: "选择账户" },
         ].map(x => x && !hideValues?.includes(x.value)
             && { label: who2desc(x.value), ...x })), // default label
         [inherit, parent, thisValue, ...wantArray(hideValues)])
@@ -306,12 +306,12 @@ export function WhoField({ value, onChange, parent, inherit, accountsApi, helper
         }),
         h(Collapse, { in: arrayMode, timeout },
             arrayMode && h(MultiSelectField as Field<string[]>, {
-                label: accounts?.length ? "Accounts " + rest.label : "You didn't create any account yet",
+                label: accounts?.length ? "账户 " + rest.label : "您还没有创建任何账户",
                 value: thisValue,
                 onChange,
                 options: accounts?.map(a => ({ value: a.username, label: a.username, a })) || [],
-                placeholder: "none",
-                ...thisValue.length === 0 && { helperText: "Select some account", error: true },
+                placeholder: "无",
+                ...thisValue.length === 0 && { helperText: "请选择账户", error: true },
                 // show icon only for groups, to save space inside the field (not the list)
                 renderOption: (x: any) => h('span', {}, x.a?.isGroup && account2icon(x.a), ' ', x.label),
             }) ),
@@ -322,11 +322,11 @@ export function WhoField({ value, onChange, parent, inherit, accountsApi, helper
                 onClick(event) {
                     onChange(objectMode ? thisValue : { this: thisValue, children: thisValue == null ? !inherit : undefined  } , { was: value, event })
                 }
-            }, objectMode ? "Set same permission for " : "Set different permission for ", contentText)
+            }, objectMode ? "为以下内容设置相同权限 " : "为以下内容设置不同权限 ", contentText)
         ),
         !isChildren && h(Collapse, { in: objectMode, timeout },
             h(WhoField, {
-                label: "Permission for " + contentText,
+                label: "权限应用于 " + contentText,
                 parent, inherit, accountsApi, otherPerms, isDir,
                 value: objectMode ? value?.children : undefined,
                 isChildren: true,
@@ -345,12 +345,12 @@ export function WhoField({ value, onChange, parent, inherit, accountsApi, helper
 }
 
 function who2desc(who: any) {
-    return who === false ? "No one"
-        : who === true ? "Anyone"
-            : who === WHO_ANY_ACCOUNT ? "Any logged-in account"
-                : who === WHO_ADMIN ? "Any admin"
+    return who === false ? "无人"
+        : who === true ? "任何人"
+            : who === WHO_ANY_ACCOUNT ? "任何已登录账户"
+                : who === WHO_ADMIN ? "任何管理员"
                     : Array.isArray(who) ? who.join(', ')
-                        : typeof who === 'string' ? `As "can ${perm2word(who)}"`
+                        : typeof who === 'string' ? `相当于“可以${perm2word(who)}”`
                             : "*UNKNOWN*" + JSON.stringify(who)
 }
 
@@ -397,30 +397,30 @@ function LinkField({ value, statusApi }: LinkFieldProps) {
         }, link)
     ), [link])
     return h(Box, { sx: { display: 'flex' } },
-        !baseHost ? "Invalid baseUrl" : !urls ? 'error' : // check data is ok
+        !baseHost ? "无效的 baseUrl" : !urls ? 'error' : // check data is ok
         h(DisplayField, {
-            label: "Link",
+            label: "链接",
             className: MASK_IN_TESTS,
-            value: link || `outside of configured main address (${baseHost})`,
+            value: link || `在配置的主地址之外（${baseHost}）`,
             error,
             InputProps: link ? { inputComponent: RenderLink } : undefined,
             end: h(Box, {},
                 h(IconBtn, {
                     icon: ContentCopy,
-                    title: "Copy",
+                    title: "复制",
                     disabled: !link,
                     doneAnimation: true,
                     onClick: () => copyTextToClipboard(link)
                 }),
-                h(IconBtn, { icon: QrCode2, title: "QR Code", onClick: showQr, disabled: !link }),
-                h(IconBtn, { icon: Edit, title: "Change", onClick() { changeBaseUrl().then(reload) } }),
+                h(IconBtn, { icon: QrCode2, title: "二维码", onClick: showQr, disabled: !link }),
+                h(IconBtn, { icon: Edit, title: "修改", onClick() { changeBaseUrl().then(reload) } }),
             )
         }),
     )
 
     function showQr() {
         newDialog({
-            title: "QR Code",
+            title: "二维码",
             dialogProps: { sx: { bgcolor: 'background.default', border: '1px solid' } },
             Content() {
                 const theme = useTheme()
@@ -463,19 +463,19 @@ export async function changeBaseUrl() {
         const proto = splitAt('//', urls[0])[0] + '//'
         urls.push(..._.difference(domainsFromRoots.map(x => proto + x), urls))
         const { close } = newDialog({
-            title: "Main address",
+            title: "主地址",
             Content() {
                 const [v, setV] = useState(base_url || '')
                 const proto = stringBefore('//', v || urls[0]) + '//'
                 const host = urls.includes(v) ? '' : v.slice(proto.length)
                 const check = h(Check, { sx: { ml: 2 } })
                 return h(Box, { sx: { display: 'flex', flexDirection: 'column' } },
-                    h(Box, { sx: { mb: 2 } }, "Choose a main address for your links"),
+                    h(Box, { sx: { mb: 2 } }, "为您的链接选择主地址"),
                     h(MenuList, {},
                         h(MenuItem, {
                             selected: !v,
                             onClick: () => set(''),
-                        }, "Automatic", !v && check),
+                        }, "自动", !v && check),
                         urls.map(u => h(MenuItem, {
                             key: u,
                             selected: u === v,
@@ -483,13 +483,13 @@ export async function changeBaseUrl() {
                         }, u, u === v && check))
                     ),
                     h(StringField, {
-                        label: "Custom IP or domain",
-                        helperText: md("You can type any address but *you* are responsible to make the address work.\nThis functionality is just to help you copy the link in case you have a domain or a complex network configuration."),
+                        label: "自定义 IP 或域名",
+                        helperText: md("您可以输入任意地址，但*您*需要自行保证该地址可用。\n此功能只是帮助您在拥有域名或复杂网络配置时复制链接。"),
                         value: host,
                         onChange: v => set(prefix(proto, ipForUrl(v))),
                         start: h(SelectField as Field<string>, {
                             value: proto,
-                            onChange: v => host ? set(v + host) : toast("Enter domain first"),
+                            onChange: v => host ? set(v + host) : toast("请先输入域名"),
                             options: ['http://','https://'],
                             size: 'small',
                             variant: 'standard',
@@ -500,7 +500,7 @@ export async function changeBaseUrl() {
                     h(Box, { sx: { mt: 2, textAlign: 'right' } },
                         h(Btn, {
                             icon: Save,
-                            children: "Save",
+                            children: "保存",
                             async onClick() {
                                 if (v !== base_url)
                                     await apiCall('set_config', { values: { [CFG.base_url]: v.replace(/\/$/, '') } })

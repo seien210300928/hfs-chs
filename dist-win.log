@@ -1,0 +1,24 @@
+
+> hfs@3.2.2 dist-win
+> npm run dist-modules && npm run dist-bin-win
+
+
+> hfs@3.2.2 dist-modules
+> cp package.json central.json README.md dist && cd dist && npm pkg delete devDependencies workspaces scripts.postinstall && rm -rf node_modules && npm install --omit=dev && npm shrinkwrap && cd .. && node scripts/prune_modules.js
+
+
+added 181 packages in 8s
+
+37 packages are looking for funding
+  run `npm fund` for details
+npm notice package-lock.json has been renamed to npm-shrinkwrap.json
+launching nm-prune
+more pruning
+pruning lodash
+
+> hfs@3.2.2 dist-bin-win
+> cd dist && pkg . --public -C gzip -t node24-win-x64 && npx resedit-cli --in hfs.exe --icon 1,../hfs.ico --out hfs.exe && zip hfs-windows-x64-$(jq -r .version ../package.json).zip hfs.exe -r plugins && cd ..
+
+> pkg@6.20.0
+> compression: GZip
+> Fetching base Node.js binaries to PKG_CACHE_PATH

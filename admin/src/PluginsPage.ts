@@ -7,12 +7,12 @@ import OnlinePlugins from './OnlinePlugins'
 import { useRoutedTab } from './routing'
 
 const TABS = [
-    { label: "Installed", path: 'installed', Pane: InstalledPlugins },
-    { label: "Get more", path: 'get', Pane: OnlinePlugins },
-    { label: "Check updates", path: 'updates', Pane: () => h(InstalledPlugins, { updates: true }) },
+    { label: "已安装", path: 'installed', Pane: InstalledPlugins },
+    { label: "获取更多", path: 'get', Pane: OnlinePlugins },
+    { label: "检查更新", path: 'updates', Pane: () => h(InstalledPlugins, { updates: true }) },
 ]
 const TAB_PATHS = TABS.map(x => x.path)
-export const PLUGIN_ERRORS = { ENOTFOUND: "Cannot reach github.com", ECONNREFUSED: "Cannot reach github.com" }
+export const PLUGIN_ERRORS = { ENOTFOUND: "无法访问 github.com", ECONNREFUSED: "无法访问 github.com" }
 
 export default function PluginsPage() {
     const [tab, setTab] = useRoutedTab('plugins', TAB_PATHS)

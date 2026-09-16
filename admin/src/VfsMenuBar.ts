@@ -31,22 +31,22 @@ export default function VfsMenuBar({ statusApi, add }: { add: ReactNode, statusA
         h(Btn, {
             ref: useCtrlShortcutButton(['s']).ref,
             icon: Save,
-            title: "Save\n(ctrl+s)",
-            disabled: !vfsModified && "No changes to save",
+            title: "保存\n(ctrl+s)",
+            disabled: !vfsModified && "没有需要保存的更改",
             modified: vfsModified,
             doneAnimation: true,
             onClick: () => saveVfs().finally(statusApi.reload)
         }),
         h(Btn, {
             icon: Undo,
-            title: "Undo/redo last change",
-            disabled: !vfsUndo && "No changes to undo",
+            title: "撤销/重做上次更改",
+            disabled: !vfsUndo && "没有可撤销的更改",
             onClick: undoVfs,
         }),
         reloadBtn(() => reloadVfs()),
         h(Btn, {
             icon: Storage,
-            title: "Disk spaces",
+            title: "磁盘空间",
             onClick: () => apiCall<Awaited<ReturnType<typeof getDiskSpaces>>>('get_disk_spaces').then(res =>
                 alertDialog(h(List, { dense: true }, res.map(x => h(ListItem, { key: x.name },
                     h(ListItemIcon, {}, h(Storage)),
@@ -55,7 +55,7 @@ export default function VfsMenuBar({ statusApi, add }: { add: ReactNode, statusA
                         primary: x.name + prefix(' (', x.description, ')'),
                         secondary: formatDiskSpace(x)
                     }),
-                ))), { title: "Disk spaces" })
+                ))), { title: "磁盘空间" })
                     .then(() => false), // no success-animation for IconBtn
                 alertDialog)
         }),
@@ -68,12 +68,12 @@ export function AddVfsBtn(props: Partial<ButtonProps>) {
     return h(MenuButton, {
         variant: 'contained',
         icon: Add,
-        title: "Add item to virtual file system",
+        title: "向虚拟文件系统添加条目",
         ...props,
         items: [
-            { children: "virtual folder", onClick: addVirtual },
-            { children: "file or folder from disk", onClick: addFiles },
-            { children: "web-link", onClick: addLink  },
+            { children: "虚拟文件夹", onClick: addVirtual },
+            { children: "来自磁盘的文件或文件夹", onClick: addFiles },
+            { children: "网页链接", onClick: addLink  },
         ]
     })
 }
@@ -87,15 +87,15 @@ function SystemIntegrationButton({ platform }: { platform: string | undefined })
         variant: 'outlined',
         doneMessage: true,
         ...(!integrated?.is ? {
-            children: "System integration",
+            children: "系统集成",
             async onClick() {
                 const msg = h(Box, { sx: { width: { xs: '100%', sm: '34em' } } },
                     h('img', { src: 'win-shell.png', style: { display: 'block', width: '100%' }  }),
-                    h(Alert, { severity: 'info' }, "We are going to add a command in the right-click of Windows File Manager.",
-                        h(Box, {}, "It will also automatically copy the URL, ready to paste!")),
+                    h(Alert, { severity: 'info' }, "我们将在 Windows 文件管理器的右键菜单中添加一个命令。",
+                        h(Box, {}, "它还会自动复制链接，可直接粘贴！")),
                 )
                 const parent = await promptDialog(msg, {
-                    field: { comp: VfsPathField, files: false, label: "Add to this folder", placeholder: "home",
+                    field: { comp: VfsPathField, files: false, label: "添加到该文件夹", placeholder: "主页",
                         autoFocus: sm }, // this dialog is tall, and mobile keyboard will disrupt user's ability to view its content
                     form: { saveOnEnter: false }
                 })
@@ -103,7 +103,7 @@ function SystemIntegrationButton({ platform }: { platform: string | undefined })
             }
         } : {
             confirm: true,
-            children: "Remove integration",
+            children: "移除集成",
             onClick: () => apiCall('windows_remove').then(reload),
         })
     })

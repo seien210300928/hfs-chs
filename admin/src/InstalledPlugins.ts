@@ -28,7 +28,7 @@ export default function InstalledPlugins({ updates }: { updates?: true }) {
             _.sortBy(list, x => (x.error ? 0 : x.started ? 1 : x.badApi ? 2 : 3) + treatPluginName(x.repo?.split('/').reverse().join('/') || x.id).toLowerCase()))
     }, [list.length, sortAgain])
     const size = 'small'
-    const { pause, pauseButton } = usePauseButton("plugins", () => getSingleConfig(CFG.suspend_plugins).then(x => !x), {
+    const { pause, pauseButton } = usePauseButton("插件", () => getSingleConfig(CFG.suspend_plugins).then(x => !x), {
         async onClick() {
             await apiCall('set_config', { values: { [CFG.suspend_plugins]: !pause } })
             if (!pause) return
@@ -39,7 +39,7 @@ export default function InstalledPlugins({ updates }: { updates?: true }) {
     const theme = useTheme()
     return h(DataTable, {
         error: isPrimitive(error) ? xlate(error, PLUGIN_ERRORS)
-            : _.map(error, (v, k) => `Error ${k} for: ${v.join(', ')}`).join('; '), // complex error for updates
+            : _.map(error, (v, k) => `错误 ${k}，插件: ${v.join(', ')}`).join('; '), // complex error for updates
         rows: list.length ? list : [], // workaround for DataGrid's bug causing 'no rows' message to be not displayed after 'loading' was also used
         fillFlex: true,
         initializing,
@@ -47,11 +47,11 @@ export default function InstalledPlugins({ updates }: { updates?: true }) {
         quickFilter: !updates,
         actionsHeader: !updates && pauseButton,
         getRowHeight: updates && (({ model }) => model.changelog ? 'auto' as const : 50),
-        noRows: updates && `No updates available. Only plugins available on "search online" are checked.`,
+        noRows: updates && `没有可用更新。仅检查"在线搜索"中可用的插件。`,
         columns: [
             {
                 field: 'id',
-                headerName: "name",
+                headerName: "名称",
                 flex: .3,
                 minWidth: 150,
                 renderCell: renderName,
@@ -75,11 +75,11 @@ export default function InstalledPlugins({ updates }: { updates?: true }) {
                 field: 'installedVersion',
                 hideUnder: true,
                 dialogHidden: true,
-                renderCell: ({ value }) => value && `Yours ${value}`
+                renderCell: ({ value }) => value && `您的版本 ${value}`
             },
             {
                 field: 'changelog',
-                headerName: "Change log",
+                headerName: "更新日志",
                 flex: 2,
                 hideUnder: !updates || 'sm',
                 sx: { flexDirection: 'column', alignItems: 'flex-start' },
@@ -100,40 +100,40 @@ export default function InstalledPlugins({ updates }: { updates?: true }) {
         actions: ({ row, id }) => updates ? [
             h(IconBtn, {
                 icon: Upgrade,
-                title: row.downloading ? "Downloading" : row.updated ? "Already updated" : "Update",
+                title: row.downloading ? "正在下载" : row.updated ? "已是最新" : "更新",
                 disabled: row.updated,
                 progress: row.downloading,
                 size,
                 async onClick() {
                     await apiCall('update_plugin', { id }, { timeout: false }).catch(e => {
                         throw e.code !== HTTP_FAILED_DEPENDENCY ? e
-                            : Error("Failed dependencies: " + e.cause?.map((x: any) => prefix(`plugin "`, x.id || x.repo, `" `) + x.error).join('; '))
+                            : Error("依赖安装失败: " + e.cause?.map((x: any) => prefix(`插件 "`, x.id || x.repo, `" `) + x.error).join('; '))
                     })
-                    toast("Plugin updated")
+                    toast("插件已更新")
                 }
             })
         ] : [
             h(IconBtn, row.started ? {
                 icon: StopCircle,
-                title: h(Box, { 'aria-hidden': true }, `Stop ${id}`, h('br'), `Started ` + new Date(row.started as string).toLocaleString()),
-                'aria-label': `Stop ${id}`,
+                title: h(Box, { 'aria-hidden': true }, `停止 ${id}`, h('br'), `启动于 ` + new Date(row.started as string).toLocaleString()),
+                'aria-label': `停止 ${id}`,
                 size,
                 color: 'success',
                 doneAnimation: true,
                 onClick: () => apiCall('stop_plugin', { id }),
             } : {
                 icon: PlayCircle,
-                title: `Start ${id}`,
-                disabled: pause && "All plugins are paused – Click the Resume button below",
+                title: `启动 ${id}`,
+                disabled: pause && "所有插件已暂停 – 请点击下方的继续按钮",
                 size,
                 onClick: () => startPlugin(id),
             }),
             h(IconBtn, {
                 icon: row.config || !row.started || !row.log ? Settings : ListAlt,
-                title: row.config || !row.log ? "Options" : "Log",
+                title: row.config || !row.log ? "选项" : "日志",
                 size,
-                disabled: !row.started && "Start plugin to access options"
-                    || !row.config && !row.log && "No options and no log for this plugin",
+                disabled: !row.started && "启动插件以访问选项"
+                    || !row.config && !row.log && "此插件没有选项也没有日志",
                 onClick() {
                     const cd = row.configDialog
                     // support css values for maxWidth without having to wrap in sx, as in DialogProps it only supports breakpoints
@@ -145,17 +145,17 @@ export default function InstalledPlugins({ updates }: { updates?: true }) {
             }),
             h(IconBtn, {
                 icon: Delete,
-                title: "Uninstall",
+                title: "卸载",
                 size,
                 async onClick() {
-                    const res = await confirmDialog(`${id}: delete configuration too?`, {
-                        trueText: "Yes",
-                        falseText: "No",
-                        after: ({ onClick }) => h(Btn, { variant: 'outlined', onClick(){ onClick(undefined) } }, "Abort")
+                    const res = await confirmDialog(`${id}：是否同时删除配置？`, {
+                        trueText: "是",
+                        falseText: "否",
+                        after: ({ onClick }) => h(Btn, { variant: 'outlined', onClick(){ onClick(undefined) } }, "中止")
                     })
                     if (res === undefined) return
                     await apiCall('uninstall_plugin', { id, deleteConfig: res })
-                    toast("Plugin uninstalled")
+                    toast("插件已卸载")
                 }
             }),
         ]
@@ -174,13 +174,13 @@ function treatPluginName(name: string) {
 export function renderName({ row, value }: any) {
     const { repo } = row
     return h(Fragment, {},
-        row.downgrade && errorIcon("This version is older than the one you installed. It is possible that the author found a problem with your version and decided to retire it.", true),
+        row.downgrade && errorIcon("此版本比您安装的版本旧。作者可能发现您的版本存在问题并决定将其下架。", true),
         errorIcon(row.error || row.badApi, !row.error),
         repo?.includes('//') ? h(Link, { href: repo, target: 'plugin' }, value)
             : with_(repo?.split('/'), arr => arr?.length !== 2 ? value
                 : h(Fragment, {},
                     h(Link, { href: 'https://github.com/' + repo, target: 'plugin', onClick(ev) { ev.stopPropagation() } }, treatPluginName(arr[1])),
-                    NBSP + 'by ', arr[0]
+                    NBSP + '作者 ', arr[0]
                 ))
 )
 
@@ -192,11 +192,11 @@ export function renderName({ row, value }: any) {
 export async function startPlugin(id: string) {
     try {
         await apiCall('start_plugin', { id })
-        toast("Plugin started", h(PlayCircle, { color: 'success' }))
+        toast("插件已启动", h(PlayCircle, { color: 'success' }))
         return true
     }
     catch(e: any) {
-        alertDialog(`Plugin ${id} didn't start, with error: ${String(e?.message || e)}`, 'error')
+        alertDialog(`插件 ${id} 启动失败，错误: ${String(e?.message || e)}`, 'error')
     }
 }
 
@@ -208,11 +208,11 @@ export const descriptionField: DataTableColumn = {
 
 export const themeField: DataTableColumn = {
     field: 'isTheme',
-    headerName: "is theme",
+    headerName: "主题",
     hideUnder: true,
     dialogHidden: true,
     type: 'boolean',
     renderCell({ value }) {
-        return value && iconTooltip(ThemeIcon, _.isString(value) ? `${value} theme` : "theme", { fontSize: '1.2rem', mr: '.3em' })
+        return value && iconTooltip(ThemeIcon, _.isString(value) ? `${value} 主题` : "主题", { fontSize: '1.2rem', mr: '.3em' })
     }
 }

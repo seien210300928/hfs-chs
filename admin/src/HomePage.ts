@@ -41,26 +41,26 @@ export default function HomePage() {
     const srv = goSecure ? https : (http?.listening && http)
     const href = srv && `http${goSecure}://`+window.location.hostname + (srv.port === (goSecure ? 443 : 80) ? '' : ':'+srv.port)
     const serverErrors = _.mapValues({ http, https }, v =>
-        v.busy ? [`port ${v.configuredPort} already used by ${v.busy}${SOLUTION_SEP}choose a `, cfgLink('different port'), ` or stop ${v.busy}`]
+        v.busy ? [`端口 ${v.configuredPort} 已被 ${v.busy} 占用${SOLUTION_SEP}请选择`, cfgLink('其他端口'), `，或停止 ${v.busy}`]
             : v.error )
     const errors = serverErrors && onlyTruthy(Object.entries(serverErrors).map(([k,v]) =>
-        v && [md(`Protocol <u>${k}</u>: `), v,
+        v && [md(`协议 <u>${k}</u>: `), v,
             (isCertError(v) || isKeyError(v)) && [
                 SOLUTION_SEP, h(LinkBtn, {
                     onClick() { suggestMakingCert().then(() => wait(999)).then(cfg.reload).then(reloadStatus) } },
-                    "make one"
-                ), " or ", SOLUTION_SEP, cfgLink("provide adequate files")
+                    "创建一个"
+                ), " 或 ", SOLUTION_SEP, cfgLink("提供合适的文件")
             ]]))
     const rightClickToInstallFromUrl = {
         async onContextMenu(ev: any) {
             ev.preventDefault()
             if (!status.updatePossible)
-                return alertDialog("Automatic update is not supported for your installation", 'warning')
-            const res = await promptDialog("Enter a link to the zip to install")
+                return alertDialog("您的安装方式不支持自动更新", 'warning')
+            const res = await promptDialog("输入要安装的 zip 文件链接")
             if (res)
                 await update(res)
         },
-        title: status.updatePossible && "Right-click if you want to install a zip",
+        title: status.updatePossible && "如需安装 zip 文件，请右键点击",
     }
     const vfs = cfg.data?.vfs
     return h(Box, {},
@@ -68,52 +68,52 @@ export default function HomePage() {
         h(Box, { sx: { display:'flex', gap: 2, flexDirection:'column', alignItems: 'flex-start', height: '100%' } },
             dontBotherWithKeys(status.alerts?.map(x => entry('warning', md(x, { html: false }))) || []),
             errors.length ? dontBotherWithKeys(errors.map(msg => entry('error', dontBotherWithKeys(msg))))
-                : entry('success', "Server is working"),
-            vfs && !vfs.children?.length && !vfs.source ? entry('warning', "You have no shared files", SOLUTION_SEP, fsLink("add some")) : null,
-            account?.adminActualAccess ? entry('', "Welcome, "+username)
-                : entry('', md("You're accessing the Admin-panel without an account because you are on localhost"),
-                    ...status.anyAccountCanLoginAdmin ? [] : [SOLUTION_SEP, "to access from another computer, you must ", h(InLink, { to:'/accounts' }, md("create an account with *admin* permission"))] ),
-            !href && entry('warning', "Frontend unreachable: ",
-                _.map(serverErrors, (v,k) => k + " " + (v ? "is in error" : "is off")).join(', '),
-                !errors.length && [ SOLUTION_SEP, cfgLink("switch http or https on") ]
+                : entry('success', "服务器运行中"),
+            vfs && !vfs.children?.length && !vfs.source ? entry('warning', "您没有共享文件", SOLUTION_SEP, fsLink("添加一些")) : null,
+            account?.adminActualAccess ? entry('', "欢迎，"+username)
+                : entry('', md("您正在 localhost 上访问管理面板，因此无需账户"),
+                    ...status.anyAccountCanLoginAdmin ? [] : [SOLUTION_SEP, "要从其他计算机访问，您必须 ", h(InLink, { to:'/accounts' }, md("创建一个具有 *admin* 权限的账户"))] ),
+            !href && entry('warning', "前端不可达: ",
+                _.map(serverErrors, (v,k) => k + " " + (v ? "出错" : "已关闭")).join(', '),
+                !errors.length && [ SOLUTION_SEP, cfgLink("打开 http 或 https") ]
             ),
             with_(status.acmeRenewError, x => x && entry('warning', x)),
             with_(status.blacklistedInstalledPlugins, x => x?.length > 0
-                && entry('warning', "Found blacklisted plugin(s): ", x.join(', ')) ),
+                && entry('warning', "发现被列入黑名单的插件: ", x.join(', ')) ),
             with_(plugins?.filter(x => x.error || x.badApi).length, x => x > 0
-                && entry('warning', `${x} plugin(s) failing`, SOLUTION_SEP, h(InLink, { to:'/plugins' }, "check now"))),
+                && entry('warning', `${x} 个插件运行失败`, SOLUTION_SEP, h(InLink, { to:'/plugins' }, "立即检查"))),
             !cfg.data?.split_uploads && (Date.now() - Number(status.cloudflareDetected || 0)) < DAY
-                && entry('', wikiLink('Reverse-proxy#cloudflare', "Cloudflare detected, read our guide")),
+                && entry('', wikiLink('Reverse-proxy#cloudflare', "检测到 Cloudflare，请阅读我们的指南")),
             with_(proxyWarning(cfg.data, status), x => x && entry('warning', x,
-                    SOLUTION_SEP, cfgLink("set the number of proxies"),
-                    SOLUTION_SEP, "unless you are sure and you can ", h(Btn, {
+                    SOLUTION_SEP, cfgLink("设置代理数量"),
+                    SOLUTION_SEP, "除非您确定并且能够 ", h(Btn, {
                         variant: 'outlined',
                         size: 'small',
                         sx: { lineHeight: 'unset' }, // fit in the line, avoiding bad layout
-                        confirm: "Go on only if you know what you are doing",
+                        confirm: "只有在您清楚自己在做什么时才继续",
                         onClick: () => apiCall('set_config', { values: { ignore_proxies: true } }).then(cfg.reload)
-                    }, "ignore this warning"),
-                    SOLUTION_SEP, wikiLink('Proxy-warning', "Explanation")
+                    }, "忽略此警告"),
+                    SOLUTION_SEP, wikiLink('Proxy-warning', "说明")
             )),
-            (cfg.data?.proxies > 0 || status?.proxyDetected) && entry('', wikiLink('Reverse-proxy', "Read our guide on proxies")),
-            status.frpDetected && entry('warning', `FRP is detected. It should not be used with "type = tcp" with HFS. Possible solutions are`,
+            (cfg.data?.proxies > 0 || status?.proxyDetected) && entry('', wikiLink('Reverse-proxy', "阅读我们的代理指南")),
+            status.frpDetected && entry('warning', `检测到 FRP。在 HFS 中不应使用 "type = tcp"。可能的解决方案：`,
                 h('ol',{},
-                    h('li',{}, `configure FRP with type=http (best solution)`),
-                    h('li',{}, md(`configure FRP to connect to HFS <u>not</u> with localhost (safe, but you won't see users' IPs)`)),
-                    h('li',{}, `disable "admin access for localhost" in HFS (safe, but you won't see users' IPs)`),
+                    h('li',{}, `将 FRP 配置为 type=http（最佳方案）`),
+                    h('li',{}, md(`将 FRP 配置为<u>不</u>通过 localhost 连接 HFS（安全，但您将看不到用户的 IP）`)),
+                    h('li',{}, `在 HFS 中禁用 "localhost 的管理员访问"（安全，但您将看不到用户的 IP）`),
                 )),
-            entry('', md("This is the *Admin-panel*, where you manage your server. Access your files on the [Front-end](../..).")),
-            entry('', wikiLink('', "See the documentation"), " and ", h(Link, { target: 'support', href: REPO_URL + 'discussions' }, "get support")),
+            entry('', md("这是 *管理面板*，您可以在这里管理服务器。在 [前端](../..) 访问您的文件。")),
+            entry('', wikiLink('', "查看文档"), " 并 ", h(Link, { target: 'support', href: REPO_URL + 'discussions' }, "获取支持")),
             !updates && with_(status.autoCheckUpdateResult, x =>
-                x?.isNewer && h(Update, { info: x, fromAuto: true, bodyCollapsed: true, title: "An update has been found" }) ),
-            pluginUpdates.length > 0 && entry('success', "Updates available for plugin(s): " + pluginUpdates.map(p => p.id).join(', ')),
+                x?.isNewer && h(Update, { info: x, fromAuto: true, bodyCollapsed: true, title: "发现新版本" }) ),
+            pluginUpdates.length > 0 && entry('success', "有可用的插件更新: " + pluginUpdates.map(p => p.id).join(', ')),
             h(ConfigForm, {
                 // MUI 7 folded Grid2 into Grid, so the generated class name changed with the import path.
                 gridProps: { sx: { mt: 1, display: 'flex', columnGap: 1, alignitems: 'center', '&>div.MuiGrid-root': { width: 'auto', px: .5, py: 0 }, '.MuiCheckbox-root': { pl: '2px' } } },
                 saveOnChange: true,
                 form: {
                     fields: [
-                        status.updatePossible === 'local' ? h(Btn, { icon: UpdateIcon, onClick: () => update() }, "Update from local file")
+                        status.updatePossible === 'local' ? h(Btn, { icon: UpdateIcon, onClick: () => update() }, "从本地文件更新")
                             : !updates && h(Btn, {
                                 icon: UpdateIcon,
                                 onClick() {
@@ -122,23 +122,23 @@ export default function HomePage() {
                                     return apiCall<typeof adminApis.check_update>('check_update').then(x => setUpdates(x.options), alertDialog)
                                 },
                                 ...rightClickToInstallFromUrl
-                            }, "Check for updates"),
-                        { k: 'auto_check_update', comp: CheckboxField, label: "Auto check updates daily" },
-                        { k: 'update_to_beta', comp: CheckboxField, label: "Include beta versions" },
+                            }, "检查更新"),
+                        { k: 'auto_check_update', comp: CheckboxField, label: "每天自动检查更新" },
+                        { k: 'update_to_beta', comp: CheckboxField, label: "包含测试版" },
                     ]
                 }
             }),
             updates && with_(_.find(updates, 'isNewer'), newer =>
-                !updates.length || !status.updatePossible && !newer ? entry('', "No update available")
-                    : newer && !status.updatePossible ? entry('success', `Version ${newer.name} available`)
+                !updates.length || !status.updatePossible && !newer ? entry('', "没有可用更新")
+                    : newer && !status.updatePossible ? entry('success', `发现新版本 ${newer.name}`)
                         : h(Flex, { vert: true },
                             updates.map((x: any) => h(Update, { info: x, key: x.name })) ),
             ),
             h(Flex, { flexWrap: 'wrap' },
                 !otherVersions && status.updatePossible && status.previousVersionAvailable
-                    && h(Btn, { icon: Restore, onClick: () => update(PREVIOUS_TAG) }, "Reinstall previous version"),
-                !status.updatePossible ? entry('', h(Link, { href: REPO_URL + 'releases/', target: 'repo' }, "All releases"))
-                    : !otherVersions ? h(Btn, { icon: Colorize, onClick: getOtherVersions, ...rightClickToInstallFromUrl }, "Get another version")
+                    && h(Btn, { icon: Restore, onClick: () => update(PREVIOUS_TAG) }, "重新安装上一个版本"),
+                !status.updatePossible ? entry('', h(Link, { href: REPO_URL + 'releases/', target: 'repo' }, "所有版本"))
+                    : !otherVersions ? h(Btn, { icon: Colorize, onClick: getOtherVersions, ...rightClickToInstallFromUrl }, "获取其他版本")
                         : h(Flex, { vert: true }, otherVersions.map((x: any) => h(Update, {
                             info: x,
                             key: x.name,
@@ -147,7 +147,7 @@ export default function HomePage() {
             ),
             h(SwitchThemeBtn),
             Date.now() - Number(new Date(status.started)) > HOUR && h(Link, {
-                title: "Donate",
+                title: "捐赠",
                 target: 'donate',
                 style: { textDecoration: 'none', position: 'fixed', bottom: 0, right: 4, fontSize: 'large' },
                 href: 'https://www.paypal.com/donate/?hosted_button_id=HC8MB4GRVU5T2'
@@ -171,10 +171,10 @@ function Update({ info, title, bodyCollapsed, fromAuto }: { title?: ReactNode, i
                     icon: UpdateIcon,
                     ...!info.isNewer && info.prerelease && { color: 'warning', variant: 'outlined' },
                     onClick: () => update(fromAuto ? undefined : info.tag_name) // in case of autoCheck, don't specify the tag_name, as it may have been retired in the meantime (in favor of a newer one)
-                }, prefix("Install ", info.name, info.isNewer ? '' : " (older)")),
+                }, prefix("安装 ", info.name, info.isNewer ? '' : "（旧版）")),
                 h(Link, { href: REPO_URL + 'releases/tag/' + info.tag_name, target: 'repo' }, h(OpenInNew)),
             ),
-            collapsed ? h(LinkBtn, { sx: { display: 'block', mt: 1 }, onClick(){ setCollapsed(false) } }, "See details")
+            collapsed ? h(LinkBtn, { sx: { display: 'block', mt: 1 }, onClick(){ setCollapsed(false) } }, "查看详情")
                 : h(Box, { sx: { mt: 1 } }, renderChangelog(info.body))
         )),
     )
@@ -190,24 +190,24 @@ function renderChangelog(s: string) {
 }
 
 async function update(tag?: string) {
-    if (!await confirmDialog("Installation may take less than a minute, depending on the speed of your server")) return
-    toast('Downloading')
+    if (!await confirmDialog("安装通常不到一分钟，具体取决于服务器速度")) return
+    toast('正在下载')
     const err = await apiCall('update', { tag }, { timeout: 600 /*download can be lengthy*/ })
         .then(() => 0, e => e)
     if (err)
         return alertDialog(err)
-    toast("Restarting")
+    toast("正在重启")
     const restarting = Date.now()
     let warning: undefined | ReturnType<typeof alertDialog>
     while (await apiCall('NONE').then(() => 0, e => !e.code)) { // while we get no response
         if (!warning && Date.now() - restarting > 15_000)
-            warning = alertDialog("This is taking too long, please check your server", 'warning')
+            warning = alertDialog("耗时过长，请检查您的服务器", 'warning')
         await wait(500)
     }
     warning?.close()
     // the server is back on, SSE is restored and login dialog may appear, unwanted because we are just waiting to reload
     subscribeKey(state, 'loginRequired', () => state.loginRequired = false)
-    await alertDialog("Procedure complete", 'success')
+    await alertDialog("流程完成", 'success')
     window.location.reload() // show new gui
 }
 
@@ -225,16 +225,16 @@ function entry(color: Color, ...content: ReactNode[]) {
     )
 }
 
-function fsLink(text=`File System page`) {
+function fsLink(text=`文件系统页面`) {
     return h(InLink, { to:'/fs' }, text)
 }
 
-function cfgLink(text=`Options page`) {
+function cfgLink(text=`选项页面`) {
     return h(InLink, { to: '/options' }, text)
 }
 
 export function proxyWarning(cfg: any, status: any) {
-    return status && cfg && !cfg.ignore_proxies && (!cfg.proxies && status.proxyDetected ? "A proxy was detected but none is configured"
-        : cfg.proxies && !status.proxyDetected && (Date.now() - +new Date(status.started) > DAY) ? `Proxy count is set to ${cfg.proxies} but none was detected recently. Consider setting it to zero`
+    return status && cfg && !cfg.ignore_proxies && (!cfg.proxies && status.proxyDetected ? "检测到代理，但未配置任何代理"
+        : cfg.proxies && !status.proxyDetected && (Date.now() - +new Date(status.started) > DAY) ? `代理数量设置为 ${cfg.proxies}，但近期未检测到代理。建议将其设置为零`
         : '')
 }

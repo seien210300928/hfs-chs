@@ -28,7 +28,7 @@ const COUNTRIES = ALL.filter(x => WITH_IP.includes(x.code))
 
 const PORT_FORWARD_URL = 'https://portforward.com/'
 const HIGHER_PORT = 1080
-const MSG_ISP = h('div', {}, "HFS will probably not be reachable on the Internet. ", wikiLink('Work-on-the-internet#double-nat', "Read more"))
+const MSG_ISP = h('div', {}, "HFS 在互联网上可能无法访问。 ", wikiLink('Work-on-the-internet#double-nat', "了解更多"))
 
 export default function InternetPage({ setTitleSide }: PageProps) {
     const [checkResult, setCheckResult] = useState<boolean | undefined>()
@@ -51,7 +51,7 @@ export default function InternetPage({ setTitleSide }: PageProps) {
             void verify(true)
     }, [verifyAgain.state])
     setTitleSide(useMemo(() =>
-        h(Alert, { severity: 'info', sx: { display: { xs: 'none', sm: 'inherit' }  } }, "This page makes sure your site is working correctly on the Internet"),
+        h(Alert, { severity: 'info', sx: { display: { xs: 'none', sm: 'inherit' }  } }, "此页面用于确保您的网站在互联网上正常工作"),
         []))
     return h(Flex, { vert: true, gap: '2em' },
         h(Box, { sx: { maxWidth: '40em' } }, networkBox()),
@@ -71,13 +71,13 @@ export default function InternetPage({ setTitleSide }: PageProps) {
         const { data } = useApiEvents<DynamicDnsResult>('get_dynamic_dns_error')
         const ref = useRef<any>()
         useEffect(() => ref.current && restartAnimation(ref.current, '1s blink'), [data]);
-        return h(TitleCard, { icon: Dns, title: "Dynamic DNS updater" },
+        return h(TitleCard, { icon: Dns, title: "动态 DNS 更新器" },
             data && h(Flex, {},
                 data.error ? h(ErrorIcon, { color: 'error', ref }) : h(Check, { color: 'success', ref }),
                 formatTimestamp(data.ts), ' – ',
-                prefix("Error: ", stripTags(data.error)).slice(0, 500) || "Updated successfully",
+                prefix("错误：", stripTags(data.error)).slice(0, 500) || "更新成功",
             ),
-            "This tool can keep your domain updated with your latest IP address. Not every service is compatible, and most of them have their own software for the job, which is superior, but we offer this lightweight solution if you prefer it.",
+            "此工具可以让您的域名随时更新为最新 IP 地址。并非所有服务都兼容，而且大多数服务都有自己专门用于此用途的软件，效果更好；如果您愿意，我们提供这个轻量级方案。",
             h(ConfigForm<{
                 [CFG.dynamic_dns_url]: string,
             }>, {
@@ -91,24 +91,24 @@ export default function InternetPage({ setTitleSide }: PageProps) {
                                 },
                                 DuckDNS: {
                                     url: 'https://www.duckdns.org/update/$domain/$token>OK',
-                                    fields: [{ k: 'domain', helperText: "do NOT include the .duckdns.org part" }, 'token'],
+                                    fields: [{ k: 'domain', helperText: "不要包含 .duckdns.org 部分" }, 'token'],
                                 }
                             }, ({ url, fields }, label) =>
                                 h(Btn, {
                                     key: url,
                                     onClick: () => formDialog({
-                                        title: label + " wizard",
+                                        title: label + " 向导",
                                         form: {
                                             sx: { maxWidth: '20em' },
-                                            before: h(Box, { sx: { mb: 1 } }, "The following information is stored unencrypted"),
+                                            before: h(Box, { sx: { mb: 1 } }, "以下信息将以未加密方式存储"),
                                             fields: fields.map(k => _.isString(k) ? { k } : k)
                                         }
                                     }).then(symbols => symbols && setValues({ [CFG.dynamic_dns_url]: replace(url, symbols as any, '$') }))
-                                }, label + " wizard")
+                                }, label + " 向导")
                             )
                         ),
-                        { k: CFG.dynamic_dns_url, label: "Updater URL", multiline: true,
-                            helperText: "Refer to your DNS service provider to know what URL can automatically keep your domain updated. Supported symbols are $IP4, $IP6, $IPX. Optionally, you can append “>” followed by a regular expression to determine a successful answer, otherwise status code will be used."
+                        { k: CFG.dynamic_dns_url, label: "更新器 URL", multiline: true,
+                            helperText: "请咨询您的 DNS 服务提供商，了解哪些 URL 可以自动保持您的域名更新。支持的符号有 $IP4、$IP6、$IPX。可选地，您可以追加“>”后跟一个正则表达式来确定成功的响应，否则将使用状态码。"
                         },
                     ]
                 })
@@ -127,48 +127,48 @@ export default function InternetPage({ setTitleSide }: PageProps) {
             }>, {
                 keys: [ CFG.geo_enable, CFG.geo_allow, CFG.geo_list, CFG.geo_allow_unknown ],
                 form: values => ({ fields: [
-                    { k: CFG.geo_enable, comp: BoolField, label: "Enable", helperText: md("Necessary database will be downloaded every month (2MB). Service is made possible thanks to [IP2Location](https://www.ip2location.com).") },
+                    { k: CFG.geo_enable, comp: BoolField, label: "启用", helperText: md("每月将下载必要数据库（2MB）。该服务由 [IP2Location](https://www.ip2location.com) 提供。") },
                     ...!values?.[CFG.geo_enable] ? [] : [
                         {
                             k: CFG.geo_allow,
                             comp: SelectField,
-                            label: "Rule",
-                            options: { "no restriction": null, "block selected countries": false, "allow selected countries": true },
+                            label: "规则",
+                            options: { "无限制": null, "屏蔽所选国家": false, "允许所选国家": true },
                         },
                         values[CFG.geo_allow] != null && {
                             k: CFG.geo_list,
                             comp: MultiSelectField<string>,
-                            label: `Selected countries (${values[CFG.geo_list]?.length || 0})`,
+                            label: `所选国家（${values[CFG.geo_list]?.length || 0}）`,
                             valueSeparator: false,
-                            placeholder: "none",
+                            placeholder: "无",
                             options: countryOptions,
                             renderOption: (v: any) => h(Country, { code: v.value, long: true }),
                             clearable: true,
-                            getError: (v: any) => values[CFG.geo_allow] && !v?.length && "Cannot be empty",
+                            getError: (v: any) => values[CFG.geo_allow] && !v?.length && "不能为空",
                         },
                         values[CFG.geo_allow] != null && {
                             k: CFG.geo_allow_unknown,
                             comp: SelectField,
-                            label: "When country cannot be determined",
-                            helperText: "Local IPs are ignored",
-                            options: { Allow: true, Block: false },
+                            label: "当无法确定国家时",
+                            helperText: "本地 IP 将被忽略",
+                            options: { 允许: true, 阻止: false },
                         },
                     ]
                 ] }),
                 addToBar: [
                     h(Box, { sx: { flex: 1 } }),
-                    h(Btn, { icon: Search, onClick: lookup }, "Lookup IP")
+                    h(Btn, { icon: Search, onClick: lookup }, "查询 IP")
                 ],
             })
         )
     }
 
     async function lookup() {
-        const ip = await promptDialog("Lookup IP")
+        const ip = await promptDialog("查询 IP")
         if (!ip) return
         const { country } = await apiCall('geo_ip', { ip })
         if (!country)
-            return alertDialog("IP not found", 'error')
+            return alertDialog("未找到 IP", 'error')
         return alertDialog(h(Country, { code: country, long: true }), 'success')
     }
 
@@ -183,13 +183,13 @@ export default function InternetPage({ setTitleSide }: PageProps) {
         const error = https?.error
         return status.element || h(TitleCard, { title: "HTTPS", icon: Lock, color: https?.listening && !error ? 'success' : 'warning' },
             error ? h(Alert, { severity: 'warning' }, error) :
-                (disabled && h(LinkBtn, { onClick: notEnabled }, "Not enabled")),
-            cert.element || with_(cert.data, c => c.none ? h(LinkBtn, { onClick: noCertClick }, "No certificate configured") : h(Box, {},
-                h(CardMembership, { fontSize: 'small', sx: { mr: 1, verticalAlign: 'middle' } }), "Current certificate",
+                (disabled && h(LinkBtn, { onClick: notEnabled }, "未启用")),
+            cert.element || with_(cert.data, c => c.none ? h(LinkBtn, { onClick: noCertClick }, "未配置证书") : h(Box, {},
+                h(CardMembership, { fontSize: 'small', sx: { mr: 1, verticalAlign: 'middle' } }), "当前证书",
                 h('ul', {},
-                    h('li', {}, "Domain: ", c.altNames?.join(' + ') ||'-'),
-                    h('li', {}, "Issuer: ", c.issuer?.O || h('i', {}, 'self-signed')),
-                    h('li', {}, "Validity: ", ['validFrom', 'validTo'].map(k => formatTimestamp(c[k])).join(' – ')),
+                    h('li', {}, "域名：", c.altNames?.join(' + ') ||'-'),
+                    h('li', {}, "颁发者：", c.issuer?.O || h('i', {}, '自签名')),
+                    h('li', {}, "有效期：", ['validFrom', 'validTo'].map(k => formatTimestamp(c[k])).join(' – ')),
                 )
             )),
             h(Divider),
@@ -206,39 +206,39 @@ export default function InternetPage({ setTitleSide }: PageProps) {
                     })
                 },
                 fields: [
-                    md("Generate certificate using [Let's Encrypt](https://letsencrypt.org)"),
+                    md("使用 [Let's Encrypt](https://letsencrypt.org) 生成证书"),
                     {
                         k: 'acme_domain',
-                        label: "Domain for certificate",
+                        label: "证书域名",
                         sm: values.acme_domain?.length > 30 ? 12 : 6,
                         required: true,
                         multiline: true,
                         fromField: x => x.replaceAll('\n', ','),
                         toField: x => x.replaceAll(',', '\n'),
-                        helperText: md("Example: your.domain.com\nMultiple domains on separate lines")
+                        helperText: md("示例：your.domain.com\n多个域名请分行填写")
                     },
                     {
                         k: 'acme_renew',
-                        label: "Automatic renew one month before expiration",
+                        label: "到期前一个月自动续期",
                         comp: BoolField,
                         disabled: !values.acme_domain
                     },
                     with_(status.data.acmeRenewError, x => x && h(Alert, { severity: 'error' }, x)),
                 ],
                 save: {
-                    children: "Request",
+                    children: "申请",
                     startIcon: h(Send),
                     ...saving && { loading: true },
                     async onClick() {
                         const [domain, ...altNames] = values.acme_domain.split(',')
                         const fresh = domain === cert.data.subject?.CN && Number(new Date(cert.data.validTo)) - Date.now() >= 30 * DAY
-                        if (fresh && !await confirmDialog("Your certificate is still good", { trueText: "Make a new one anyway" }))
+                        if (fresh && !await confirmDialog("您的证书仍然有效", { trueText: "仍然重新申请" }))
                             return
-                        if (!await confirmDialog("HFS must temporarily serve HTTP on public port 80, and your router must be configured or this operation will fail")) return
+                        if (!await confirmDialog("HFS 必须临时在公共端口 80 上提供 HTTP 服务，并且您的路由器必须已配置，否则此操作将失败")) return
                         if (await stopOnCheckDomain(domain)) return
                         await apiCall('make_cert', { domain, altNames }, { timeout: 20_000 })
                             .then(async () => {
-                                await alertDialog("Certificate created", 'success')
+                                await alertDialog("证书已创建", 'success')
                                 if (disabled)
                                     await notEnabled()
                                 cert.reload()
@@ -257,7 +257,7 @@ export default function InternetPage({ setTitleSide }: PageProps) {
     }
 
     async function notEnabled() {
-        if (!await confirmDialog("HTTPS is currently disabled.\nFull configuration is available in the Options page.", { trueText: "Enable it"})) return
+        if (!await confirmDialog("HTTPS 当前已禁用。\n完整配置可在“选项”页面中进行。", { trueText: "启用"})) return
         const stop = waitDialog()
         try {
             await apiCall('set_config', { values: { https_port: 443 } })
@@ -268,16 +268,16 @@ export default function InternetPage({ setTitleSide }: PageProps) {
     }
 
     function baseUrlBox() {
-        return config.element || h(TitleCard, { icon: Public, title: "Address" },
+        return config.element || h(TitleCard, { icon: Public, title: "地址" },
             h(Flex, { flexWrap: 'wrap' },
-                "Main address: ",
-                baseUrl ? h('tt', {}, baseUrl) : "automatic, not configured",
+                "主地址：",
+                baseUrl ? h('tt', {}, baseUrl) : "自动，未配置",
                 h(Btn, {
                     size: 'small',
                     variant: 'outlined',
-                    'aria-label': "Change address",
+                    'aria-label': "更改地址",
                     onClick: () => void changeBaseUrl().then(config.reload)
-                }, "Change"),
+                }, "更改"),
             ),
             h(Divider),
             h(ConfigForm<{ roots: any, force_address: boolean }>, {
@@ -289,21 +289,21 @@ export default function InternetPage({ setTitleSide }: PageProps) {
                     fields: [
                         {
                             k: CFG.roots,
-                            label: "Domain roots",
-                            helperText: "You can decide different home-folders (in the VFS) for different domains, a bit like virtual hosts. If none is matched, the default home will be used.",
+                            label: "域名根目录",
+                            helperText: "您可以为不同的域名指定不同的主文件夹（在 VFS 中），有点像虚拟主机。如果没有匹配的域名，将使用默认主页。",
                             comp: ArrayField,
                             fields: [
-                                { k: 'host', label: "Domain/Host", helperText: "Wildcards supported: *.domain.com|other.com",
-                                    getError: (v?: string) => v?.includes('/') && "No URLs or paths here!" },
-                                { k: 'root', label: "Home/Root", comp: VfsPathField, files: false, placeholder: "default", helperText: "Root path in VFS",
-                                    $column: { renderCell({ value }: any) { return value || h('i', {}, 'default') } } },
+                                { k: 'host', label: "域名/主机", helperText: "支持通配符：*.domain.com|other.com",
+                                    getError: (v?: string) => v?.includes('/') && "这里不能填写 URL 或路径！" },
+                                { k: 'root', label: "主页/根目录", comp: VfsPathField, files: false, placeholder: "默认", helperText: "VFS 中的根路径",
+                                    $column: { renderCell({ value }: any) { return value || h('i', {}, '默认') } } },
                             ],
                             toField: x => Object.entries(x || {}).map(([host,root]) => ({ host, root })),
                             fromField: x => Object.fromEntries(x.map((row: any) => [row.host, row.root || ''])),
                         },
                         {
                             k: CFG.force_address,
-                            label: "Accept requests only using domains above (and localhost)",
+                            label: "仅接受使用上述域名（和 localhost）的请求",
                             comp: BoolField,
                         }
                     ]
@@ -316,28 +316,28 @@ export default function InternetPage({ setTitleSide }: PageProps) {
         if (nat.error) return nat.element
         const direct = publicIps?.includes(data?.localIp!)
         return h(Flex, { justifyContent: 'space-around' },
-            h(Device, { name: "Server", icon: direct ? Storage : HomeWorkTwoTone, color: localColor, ip: data?.localIp,
-                below: port && h(Box, { className: 'port ' + HIDE_IN_TESTS }, "port ", port),
+            h(Device, { name: "服务器", icon: direct ? Storage : HomeWorkTwoTone, color: localColor, ip: data?.localIp,
+                below: port && h(Box, { className: 'port ' + HIDE_IN_TESTS }, "端口 ", port),
             }),
             !direct && h(DataLine),
             !direct && h(Device, {
-                name: "Router", icon: RouterTwoTone, ip: data?.gatewayIp,
+                name: "路由器", icon: RouterTwoTone, ip: data?.gatewayIp,
                 color: checkResult ? 'success' : data?.mapped && (wrongMap ? 'warning' : 'success'),
                 below: mapping ? h(LinearProgress, { sx: { height: '1em' } })
                     : data && (
-                        checkResult && !data.mapped ? `port ${data.externalPort || data.internalPort}`
+                        checkResult && !data.mapped ? `端口 ${data.externalPort || data.internalPort}`
                             : h(LinkBtn, { sx: { display: 'block' }, onClick: configure },
-                                "port ", wrongMap ? "is wrong" : data?.externalPort || (checkResult ? "verified" : "unknown"))
+                                "端口 ", wrongMap ? "错误" : data?.externalPort || (checkResult ? "已验证" : "未知"))
                     ),
             }),
             h(DataLine),
-            h(Device, { name: "Internet", icon: PublicTwoTone, ip: publicIps,
+            h(Device, { name: "互联网", icon: PublicTwoTone, ip: publicIps,
                 color: checkResult ? 'success' : checkResult === false ? 'error' : doubleNat ? 'warning' : undefined,
                 below: checking ? h(LinearProgress, { sx: { height: '1em' } }) : publicIps && h(Box, { className: HIDE_IN_TESTS },
-                    doubleNat && h(LinkBtn, { sx: { display: 'block' }, onClick: () => alertDialog(MSG_ISP, 'warning') }, "Double NAT"),
-                    checkResult ? "Working!" : checkResult === false ? "Failed!" : '',
+                    doubleNat && h(LinkBtn, { sx: { display: 'block' }, onClick: () => alertDialog(MSG_ISP, 'warning') }, "双重 NAT"),
+                    checkResult ? "工作正常！" : checkResult === false ? "失败！" : '',
                     ' ',
-                    (baseUrl > '' || publicIps?.length > 0) && data?.internalPort && h(LinkBtn, { onClick: () => verify() }, "Verify")
+                    (baseUrl > '' || publicIps?.length > 0) && data?.internalPort && h(LinkBtn, { onClick: () => verify() }, "验证")
                         || ' ' // steadier layout, mainly for testing
                 )
             }),
@@ -346,7 +346,7 @@ export default function InternetPage({ setTitleSide }: PageProps) {
 
     async function stopOnCheckDomain(domain: string) {
         return domain && false === await apiCall('check_domain', { domain }).catch(e =>
-            confirmDialog(String(e), { trueText: "Continue anyway", falseText: "Stop" }))
+            confirmDialog(String(e), { trueText: "仍然继续", falseText: "停止" }))
     }
 
     async function verify(again=false): Promise<any> {
@@ -354,28 +354,28 @@ export default function InternetPage({ setTitleSide }: PageProps) {
         const data = nat.getData() // fresh data
         if (!data) return
         setCheckResult(undefined)
-        if (!again && !await confirmDialog("This test will check if your server is working properly on the Internet")) return
+        if (!again && !await confirmDialog("此测试将检查您的服务器在互联网上是否正常工作")) return
         setChecking(true)
         try {
             const hostname = baseUrl && new URL(baseUrl).hostname
             const checkUrl = !isIpLan(hostname) && baseUrl
             if (!isIP(hostname) && await stopOnCheckDomain(hostname)) return
             const urlResult = checkUrl && await apiCall('self_check', { url: checkUrl }).catch(e =>
-                alertDialog(!e.code ? e : "Sorry, this function is not available at the moment. Retry later.", 'error'))
+                alertDialog(!e.code ? e : "抱歉，此功能目前不可用。请稍后重试。", 'error'))
             if (checkUrl && !urlResult)
                 return
             if (urlResult?.success) {
                 setCheckResult(true)
-                return alertDialog(h(Box, {}, "Your server is responding correctly over the Internet:",
+                return alertDialog(h(Box, {}, "您的服务器在互联网上响应正常：",
                     h('ul', {}, h('li', {}, urlResult.url))), 'success')
             }
             if (urlResult?.success === false)
-                await alertDialog(md(`Your configured address ${checkUrl} doesn't seem to work 😰\nstill, we are going to test your IP address 🤞`), 'warning')
+                await alertDialog(md(`您配置的地址 ${checkUrl} 似乎无法工作 😰\n我们仍将测试您的 IP 地址 🤞`), 'warning')
             const res = await apiCall('self_check', {})
             if (res.some((x: any) => x.success)) {
                 setCheckResult(true)
-                const mild = urlResult.success === false && md(`Your server is responding over the Internet 👍\nbut not with configured address ${checkUrl} 👎\njust on your IP:`)
-                return alertDialog(h(Box, {}, mild || "Your server is responding correctly over the Internet:",
+                const mild = urlResult.success === false && md(`您的服务器在互联网上响应正常 👍\n但配置的地址 ${checkUrl} 无法工作 👎\n仅通过您的 IP 响应：`)
+                return alertDialog(h(Box, {}, mild || "您的服务器在互联网上响应正常：",
                     h('ul', {}, ...res.map((x: any) => h('li', {}, x.url)))), mild ? 'warning' : 'success')
             }
             setCheckResult(false)
@@ -383,30 +383,30 @@ export default function InternetPage({ setTitleSide }: PageProps) {
                 return fixPort().then(verifyAgain)
             if (doubleNat)
                 return alertDialog(MSG_ISP, 'warning')
-            const msg = "We couldn't reach your server from the Internet. "
+            const msg = "我们无法从互联网访问您的服务器。 "
             if (data.upnp && !data!.mapped)
-                return confirmDialog(msg + "Try port-forwarding on your router", { trueText: "Fix it" }).then(async go => {
+                return confirmDialog(msg + "请在路由器上尝试端口转发", { trueText: "修复" }).then(async go => {
                     if (!go) return
                     try { await mapPort(data!.internalPort!, '', '') }
                     catch { await mapPort(HIGHER_PORT, '') }
-                    toast("Port forwarded, now we verify again", 'success')
+                    toast("端口已转发，现在重新验证", 'success')
                     verifyAgain()
                 })
             const cfg = await apiCall('get_config', { only: [CFG.geo_enable, CFG.geo_allow] })
-            const { close } = alertDialog(h(Box, {}, msg + "Possible causes:", h('ul', {},
-                cfg[CFG.geo_enable] && cfg[CFG.geo_allow] != null && h('li', {}, "You may be blocking a country from where the test is performed"),
-                !data.upnp && h('li', {}, "Your router may need to be configured. ", h(Link, { href: PORT_FORWARD_URL, target: 'help' }, "How?")),
-                h('li', {}, "There could be a firewall, try configuring or disabling it."),
+            const { close } = alertDialog(h(Box, {}, msg + "可能的原因：", h('ul', {},
+                cfg[CFG.geo_enable] && cfg[CFG.geo_allow] != null && h('li', {}, "您可能屏蔽了执行测试所在的国家"),
+                !data.upnp && h('li', {}, "您的路由器可能需要配置。 ", h(Link, { href: PORT_FORWARD_URL, target: 'help' }, "怎么做？")),
+                h('li', {}, "可能存在防火墙，请尝试配置或禁用。"),
                 (data.externalPort || data.internalPort!) <= 1024 && h('li', {},
-                    "Your Internet Provider may be blocking ports under 1024. ",
+                    "您的网络服务提供商可能屏蔽了 1024 以下的端口。 ",
                     data.upnp && h(Button, {
                         size: 'small',
                         onClick() {
                             close()
                             mapPort(HIGHER_PORT).then(verifyAgain)
                         }
-                    }, "Try " + HIGHER_PORT)),
-                data.mapped && h('li', {}, "A bug in your modem/router, try rebooting it."),
+                    }, "尝试 " + HIGHER_PORT)),
+                data.mapped && h('li', {}, "您的调制解调器/路由器可能存在故障，请尝试重启。"),
                 h('li', {}, MSG_ISP),
             )), 'warning')
         }
@@ -421,34 +421,34 @@ export default function InternetPage({ setTitleSide }: PageProps) {
     async function configure() {
         if (!data) return // shut up ts
         if (wrongMap)
-            return await confirmDialog(`There is a port-forwarding but it is pointing to the wrong port (${wrongMap})`, { trueText: "Fix it" })
+            return await confirmDialog(`存在端口转发，但它指向了错误的端口（${wrongMap}）`, { trueText: "修复" })
                 && fixPort()
         if (!data.upnp)
-            return alertDialog(h(Box, { sx: { lineHeight: 1.5 } }, md(`We cannot help you configuring your router because UPnP is not available.\nFind more help [on this website](${PORT_FORWARD_URL}).`)), 'info')
-        const msg = `For HFS to work over the Internet, you need a port on your modem/router forwarded to this computer's port ${port}.\n\n`
-            + (data?.mapped ? '' : `You may want to check if that's already the case before trying the following.\n\n`)
-            + `This will ask the router to forward a port.\nYou can use the same number as the local network port (${port}), or a different one.`
+            return alertDialog(h(Box, { sx: { lineHeight: 1.5 } }, md(`由于 UPnP 不可用，我们无法帮您配置路由器。\n[在此网站](${PORT_FORWARD_URL}) 查找更多帮助。`)), 'info')
+        const msg = `要让 HFS 在互联网上工作，您需要在调制解调器/路由器上将一个端口转发到此电脑的端口 ${port}。\n\n`
+            + (data?.mapped ? '' : `在尝试以下操作之前，您可能需要先确认这一点。\n\n`)
+            + `这将请求路由器转发一个端口。\n您可以使用与本地网络端口相同的编号（${port}），或使用不同的编号。`
         const res = await promptDialog(md(msg), {
             value: data.externalPort || port,
-            field: { label: "Port seen from the Internet", comp: NumberField },
-            addToBar: data.mapped && [h(Button, { color: 'warning', onClick: remove }, "Remove")],
+            field: { label: "从互联网看到的端口", comp: NumberField },
+            addToBar: data.mapped && [h(Button, { color: 'warning', onClick: remove }, "移除")],
             dialogProps: { sx: { maxWidth: '20em' } },
         })
         if (res)
-            await mapPort(Number(res), "Port forwarded").catch(() => {})
+            await mapPort(Number(res), "端口已转发").catch(() => {})
 
         function remove() {
             closeDialog()
-            mapPort(0, "Port removed")
+            mapPort(0, "端口已移除")
         }
     }
 
     function fixPort() {
-        if (!data?.externalPort) return alertDialog("externalPort not found", 'error')
-        return mapPort(data.externalPort, "Forwarding corrected")
+        if (!data?.externalPort) return alertDialog("未找到 externalPort", 'error')
+        return mapPort(data.externalPort, "转发已纠正")
     }
 
-    async function mapPort(external: number, msg='', errMsg="Operation failed") {
+    async function mapPort(external: number, msg='', errMsg="操作失败") {
         setMapping(true)
         try {
             await apiCall('map_port', { external })
@@ -459,7 +459,7 @@ export default function InternetPage({ setTitleSide }: PageProps) {
         catch(e: any) {
             if (errMsg) {
                 const low = (external || data!.internalPort!) < 1024
-                const msg = errMsg + prefix(': ', e?.message) + (low ? ". Some routers refuse to work with ports under 1024." : '')
+                const msg = errMsg + prefix(': ', e?.message) + (low ? "。某些路由器拒绝使用 1024 以下的端口。" : '')
                 await alertDialog(msg, 'error')
             }
             throw e
@@ -479,7 +479,7 @@ function Device({ name, icon, color, ip, below }: any) {
     return h(Box, { sx: { display: 'inline-block', textAlign: 'center' } },
         h(icon, { color, sx: { fontSize, mb: '-0.1em' } }),
         h(Box, { sx: { fontSize: 'larger' } }, name),
-        ip === undefined ? h(Skeleton) : h(Box, { sx: { fontSize: 'smaller', whiteSpace: 'pre-wrap' }, className: 'ip ' + HIDE_IN_TESTS }, wantArray(ip).join('\n') || "unknown"),
+        ip === undefined ? h(Skeleton) : h(Box, { sx: { fontSize: 'smaller', whiteSpace: 'pre-wrap' }, className: 'ip ' + HIDE_IN_TESTS }, wantArray(ip).join('\n') || "未知"),
         below ? h(Box, { sx: { fontSize: 'smaller' } }, below) : h(Skeleton),
     )
 }

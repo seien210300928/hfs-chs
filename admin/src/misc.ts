@@ -10,11 +10,11 @@ export * from '@hfs/shared'
 export function err2msg(code: string | number) {
     const permPath = typeof code === 'string' && code.split("Error: EPERM: operation not permitted, access ")[1]?.split('\n')[0]
     if (permPath)
-        return `Access denied on disk for ${permPath}`
+        return `磁盘访问被拒绝：${permPath}`
     return {
-        github_quota: "Request denied. You may have reached the limit, retry later.",
-        ENOENT: "Not found",
-        ENOTDIR: "Not a folder",
+        github_quota: "请求被拒绝。您可能已达限制，请稍后重试。",
+        ENOENT: "未找到",
+        ENOTDIR: "不是文件夹",
     }[code] || HTTP_MESSAGES[code as any] || httpCodes[code] || String(code) // prefer short form, as httpCodes is quite long
 }
 

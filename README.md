@@ -1,3 +1,25 @@
+注意：
+* 本分支不会进行软件发布，若有需要需自行按照以下克隆流程编译
+* 编译前请确保你的计算机已经至少安装了 Node.js，推荐 22 版本
+
+1. 克隆本分支：`git clone git@github.com:seien210300928/hfs-chs.git && cd hfs-chs`
+2. Windows 必须让 npm 用 Git Bash 执行脚本（关键步骤；Linux/macOS 跳过）：
+3. 首次或 node_modules 缺失时安装依赖：`npm install`（触发 patch-package 补丁）
+4. 全量编译：`npm run build-all`
+5. 按目标平台打包
+   - Windows
+     - X64：`npm run dist-win`
+     - ARM64：仓库未内置，需在 package.json 的 scripts 中添加
+       `"dist-bin-win-arm": "cd dist && pkg . --public -C gzip -t node24-win-arm64 && zip hfs-windows-arm64-$(jq -r .version ../package.json).zip hfs.exe -r plugins && cd .."`
+       然后执行 `npm run dist-modules && npm run dist-bin-win-arm`
+   - Linux
+     - X64：`npm run dist-linux`
+     - ARM64：`npm run dist-modules && npm run dist-bin-linux-arm`
+   - macOS
+     - X64：`npm run dist-mac`
+     - ARM64：`npm run dist-mac-arm`
+6. 如果过程顺利，现在你就可以将 `dist/` 下的 `HFS` 的二进制文件和 `plugins` 文件夹 复制到你想要的地方启动了
+
 # HFS: HTTP File Server
 
 ![logo and motto](hfs-logo-color-motto.svg)

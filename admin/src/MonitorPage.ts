@@ -181,7 +181,7 @@ function Connections() {
                             renderCell: ({ value, row }) => h(Country, { code: value, ip: row.ip }),
                         },
                         {
-                            field: '用户',
+                            field: 'user',
                             headerName: "用户",
                             hideUnder: 'md',
                         },

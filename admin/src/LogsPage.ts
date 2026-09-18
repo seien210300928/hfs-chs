@@ -96,8 +96,8 @@ export default function LogsPage({ setTitleSide }: PageProps) {
                             { k: CFG.log_gui, sm: 6, comp: BoolField, label: "记录界面加载", helperText: "加载界面需要一些请求" },
                             { k: CFG.log_api, sm: 6, comp: BoolField, label: "记录 API 请求", helperText: "用于命令的请求" },
                             { k: CFG.log_ua, sm: 6, comp: BoolField, label: "记录 User-Agent", helperText: "包含浏览器和可能的操作系统信息。可能会使磁盘上的日志体积翻倍。" },
-                            { k: CFG.log_host, sm: 6, comp: BoolField, label: "Log Host header" },
-                            { k: CFG.log_spam, sm: 6, comp: BoolField, label: "记录垃圾请求", helperText: md`Failed requests that you probably don't want to see` },
+                            { k: CFG.log_host, sm: 6, comp: BoolField, label: "记录 Host 头" },
+                            { k: CFG.log_spam, sm: 6, comp: BoolField, label: "记录垃圾请求", helperText: md`垃圾请求是您可能不想看到的*失败*请求` },
                             { k: CFG.track_ips, sm: 6, comp: BoolField, label: "跟踪 IP",
                                 parentProps: { sx: { display: 'flex', gap: 1, alignItems: 'flex-start' } },
                                 after: h(Btn, {
@@ -289,7 +289,7 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
                 renderCell: ({ value }) => h(Country, { code: value, def: '-' }),
             },
             {
-                field: '用户',
+                field: 'user',
                 headerName: "用户名",
                 flex: .3,
                 maxWidth: 200,

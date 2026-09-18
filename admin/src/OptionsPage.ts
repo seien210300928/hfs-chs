@@ -231,8 +231,8 @@ export default function OptionsPage() {
                 { k: CFG.theme, comp: SelectField, xs: 6, sm: 3, options: THEME_OPTIONS },
                 { k: CFG.sort_by, comp: SelectField, xs: 6, sm: 3, options: SORT_BY_OPTIONS },
 
-                { k: CFG.invert_order, comp: BoolField, xs: 6, md: 3 },
-                { k: CFG.folders_first, comp: BoolField, xs: 6, md: 3 },
+                { k: CFG.invert_order, comp: BoolField, xs: 6, md: 3, label: "反转排序" },
+                { k: CFG.folders_first, comp: BoolField, xs: 6, md: 3, label: "文件夹优先" },
                 { k: CFG.sort_numerics, comp: BoolField, xs: 6, md: 3, label: "数字名称按数值排序" },
                 { k: CFG.title_with_path, comp: BoolField, xs: 6, md: 3, label: "标题包含路径" },
                 { k: CFG.favicon, comp: FileField, placeholder: "无", fileMask: '*.ico|' + IMAGE_FILEMASK, xs: 12, sm: 6,
@@ -262,7 +262,7 @@ export default function OptionsPage() {
                         "保存在文件属性中 + 加载 DESCRIPT.ION": 'attr+ion',
                     } },
 
-                { k: CFG.keep_session_alive, comp: BoolField, sm: 6, md: 6, helperText: "在页面保持打开且电脑开机时保持登录状态" },
+                { k: CFG.keep_session_alive, comp: BoolField, sm: 6, md: 6, label: "保持会话活跃", helperText: "在页面保持打开且电脑开机时保持登录状态" },
                 { k: CFG.session_duration, comp: NumberField, sm: 3, md: 3, min: 5, unit: "秒", label: "会话时长", required: true },
                 { k: CFG.size_1024, label: "KB 大小", comp: SelectField, sm: 3, options: { 1000: false, 1024: true } },
 

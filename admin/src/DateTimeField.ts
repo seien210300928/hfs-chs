@@ -8,7 +8,7 @@ import _ from 'lodash'
 import { mergeSx } from './mui'
 
 export function DateTimeField({ onChange, error, helperText, setApi, ...rest }: FieldProps<Date>) {
-    setApi?.({ getError: v => v && !dayjs(v).isValid() && "Invalid date" }) // invalid dates serialize as null, so the form must reject them before saving
+    setApi?.({ getError: v => v && !dayjs(v).isValid() && "无效的日期" }) // invalid dates serialize as null, so the form must reject them before saving
     return h(Box, {},
         h(DateTimePicker, {
             ..._.mapValues(rest, x => isTimestampString(x) || x && x instanceof Date ? dayjs(x) : (x ?? null)), // null to not be considered uncontrolled
@@ -25,3 +25,4 @@ export function DateTimeField({ onChange, error, helperText, setApi, ...rest }: 
         }),
     )
 }
+

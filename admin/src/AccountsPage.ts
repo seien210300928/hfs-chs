@@ -39,8 +39,8 @@ export default function AccountsPage() {
     const sideContent = !(sel.length > 0) || !list ? null // this clever test is true both when some accounts are selected and when we are in "new account" modes
         : selectionMode && sel.length > 1 ? h(Fragment, {},
                 h(Flex, {},
-                    h(Typography, {variant: 'h6'}, sel.length + " selected"),
-                    h(Btn, { onClick: deleteAccounts, icon: Delete }, "Remove"),
+                    h(Typography, {variant: 'h6'}, sel.length + " 个已选"),
+                    h(Btn, { onClick: deleteAccounts, icon: Delete }, "移除"),
                 ),
                 h(List, {},
                     _.uniq(sel.map(userFromItemId)).map(username =>
@@ -55,7 +55,7 @@ export default function AccountsPage() {
                         h(Box, { sx: { flex: 1 } }),
                         account2icon(a, { fontSize: 'large', sx: { p: 1 }}),
                         // not really useful, but users misled in thinking it's a dialog will find satisfaction in dismissing the form
-                        h(IconBtn, {  icon: Close, title: "Close", onClick: selectNone }),
+                        h(IconBtn, {  icon: Close, title: "关闭", onClick: selectNone }),
                     ],
                     reload,
                     done(username, saveBtn) {
@@ -68,8 +68,8 @@ export default function AccountsPage() {
         if (isSideBreakpoint || !sideContent || !sel.length) return
         const { close } = newDialog({
             title: _.isString(sel) ? _.startCase(sel)
-                : sel.length > 1 ? "Multiple selection"
-                    : selectedAccount ? (selectedAccount.isGroup ? "Group: " : "User: ") + selectedAccount.username
+                : sel.length > 1 ? "多选"
+                    : selectedAccount ? (selectedAccount.isGroup ? "组: " : "用户: ") + selectedAccount.username
                         : '?', // never
             Content: () => sideContent,
             onClose(keepSelection) {
@@ -82,7 +82,7 @@ export default function AccountsPage() {
     }, [isSideBreakpoint, sel, selectedAccount])
 
     const scrollProps = { height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto' } as const
-    const [showTree, showTreeBtn] = useToggleButton("Show tree", "Show list", () => ({ icon: AccountTree }), accountsAsTree)
+    const [showTree, showTreeBtn] = useToggleButton("显示树", "显示列表", () => ({ icon: AccountTree }), accountsAsTree)
     state.accountsAsTree = showTree
     return element || h(Grid, { container: true, sx: { rowSpacing: 1, columnSpacing: 2, top: 0, flex: '1 1 auto', height: 0 } },
         h(Grid, { size: { xs: 12, [sideBreakpoint]: 5, lg: 4, xl: 5 } as any, sx: scrollProps },
@@ -104,16 +104,16 @@ export default function AccountsPage() {
                     variant: 'contained',
                     startIcon: h(PersonAdd),
                     items: [
-                        { children: "user", onClick: () => setSel('new-user') },
-                        { children: "group", onClick: () => setSel('new-group') },
-                        { children: "from CSV", onClick: () => importAccountsCsv(reload) },
+                        { children: "用户", onClick: () => setSel('new-user') },
+                        { children: "组", onClick: () => setSel('new-group') },
+                        { children: "从 CSV 导入", onClick: () => importAccountsCsv(reload) },
                     ]
-                }, "Add"),
+                }, "添加"),
                 reloadBtn(reload),
                 showTreeBtn,
-                list?.length! > 0 && h(Typography, { sx: { p: 1 } }, `${list!.length} account(s)`),
+                list?.length! > 0 && h(Typography, { sx: { p: 1 } }, `${list!.length} 个账户`),
             ),
-            !list?.length && h(Alert, { severity: 'info' }, md`To access administration <u>remotely</u> you will need to create a user account with admin permission`),
+            !list?.length && h(Alert, { severity: 'info' }, md`如需<u>远程</u>访问管理界面，你需要创建一个具有管理员权限的账户`),
             h(SimpleTreeView<true>, { // true because it's not detecting multiSelect correctly (ts495)
                     multiSelect: true,
                     sx: { pr: 4, pb: 2, minWidth: '15em' },
@@ -143,9 +143,9 @@ export default function AccountsPage() {
                                 },
                                 account2icon(ac),
                                 (ac.disabled || ac.canLogin === false)
-                                && iconTooltip(DoNotDisturb, ac.disabled ? "Disabled" : "Disabled by its groups", ac.disabled ? undefined : { color: 'text.secondary' }),
+                                && iconTooltip(DoNotDisturb, ac.disabled ? "已禁用" : "被其组禁用", ac.disabled ? undefined : { color: 'text.secondary' }),
                                 (ac.expire || ac.days_to_live) && h(Schedule),
-                                ac.adminActualAccess && iconTooltip(MilitaryTech, "Can login into Admin"),
+                                ac.adminActualAccess && iconTooltip(MilitaryTech, "可登录管理面板"),
                                 ac.username,
                                 Boolean(ac.belongs?.length) && h(Box, { sx: { color: 'text.secondary', fontSize: 'small' } },
                                     '(', ac.belongs?.join(', '), ')')
@@ -180,18 +180,18 @@ export default function AccountsPage() {
     async function deleteAccounts() {
         if (typeof sel === 'string') return
         if (sel.some(x => userFromItemId(x) === username))
-            if (!await confirmDialog(`You cannot ask to delete the account you are using. Continue with the rest?`)) return
+            if (!await confirmDialog(`您不能删除正在使用的账户。是否继续删除其余账户？`)) return
         const toDelete = _.without(_.uniq(sel.map(userFromItemId)), username)
         if (!toDelete.length)
-            return alertDialog("Nothing to delete", 'info')
-        if (!await confirmDialog(`Delete ${toDelete.length} item(s)?`)) return
+            return alertDialog("没有可删除的项", 'info')
+        if (!await confirmDialog(`删除 ${toDelete.length} 个条目？`)) return
         const errors = []
         for (const username of toDelete)
             if (!await apiCall('del_account', { username }).then(() => 1, () => 0))
                 errors.push(username)
         reload()
         if (errors.length)
-            return alertDialog("The following items couldn't be deleted: " + errors.join(', '), 'error')
+            return alertDialog("以下条目无法删除：" + errors.join(', '), 'error')
     }
 
 }

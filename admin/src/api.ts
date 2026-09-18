@@ -22,7 +22,7 @@ setDefaultApiCallOptions({
     }
 })
 
-const ERRORS = { timeout: "Operation timeout" }
+const ERRORS = { timeout: "操作超时" }
 // expand useApi with things that cannot be shared with Frontend
 export type ApiObject<T extends ApiHandler=any> = ReturnType<typeof useApiEx<T>>
 export function useApiEx<T extends ApiHandler=any>(...args: Parameters<typeof useApi>) {
@@ -32,7 +32,7 @@ export function useApiEx<T extends ApiHandler=any>(...args: Parameters<typeof us
         element: useMemo(() =>
             !args[0] ? null
                 : res.error ? h(Alert, { severity: 'error' }, xlate(String(res.error), ERRORS),
-                                    h(IconBtn, { icon: Refresh, title: "Reload", onClick: res.reload, sx: { m:'-10px 0 -8px 16px' } }) )
+                                    h(IconBtn, { icon: Refresh, title: "重新加载", onClick: res.reload, sx: { m:'-10px 0 -8px 16px' } }) )
                     : res.data === undefined ? spinner()
                         : null,
             Object.values(res))
@@ -86,7 +86,7 @@ export function useApiList<T=any, S=T>(cmd:string|Falsy, params: Dict={}, { map,
                         setConnecting(false)
                         return setTimeout(() => apply.flush()) // this trick we'll cause first entries to be rendered almost immediately, while the rest will be subject to normal debouncing
                     case 'error':
-                        setError("Connection error")
+                        setError("连接错误")
                         src.close()
                         retry = setTimeout(connect, 1000)
                         return stop()

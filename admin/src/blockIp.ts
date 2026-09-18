@@ -9,14 +9,14 @@ export function BlockIpBtn({ ip, comment, ...rest }: { ip: string, comment: stri
     const { data, refresh } = useBatch(isIpBlocked, ip, { delay: 100, expireAfter: 5_000 })
     return h(IconBtn, {
         icon: Block,
-        title: "Block IP",
-        confirm: "Block address " + ip,
-        ...data && { disabled: true, title: "Blocked" },
+        title: "屏蔽 IP",
+        confirm: "屏蔽地址 " + ip,
+        ...data && { disabled: true, title: "已屏蔽" },
         ...rest,
         async onClick() {
             await apiCall('add_block', { ip, merge: { comment } })
             refresh()
-            toast("Blocked", 'success')
+            toast("已屏蔽", 'success')
         }
     })
 }

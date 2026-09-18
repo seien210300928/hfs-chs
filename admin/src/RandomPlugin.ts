@@ -31,12 +31,12 @@ export function RandomPlugin() {
     }, [list, initializing])
     useEffect(() => {
         if (idx > 0 && !one)
-            toast("No more plugins!")
+            toast("没有更多插件了！")
     }, [idx])
     if (hideRandomPlugin || !one) return
     return h(Card, { sx: { display: { xs: 'none', md: 'block' }, float: 'right', width: 'min(50%, 30em)', ml: '1em' } },
         h(CardContent, {},
-            h(Box, { sx: { fontWeight: 'bold', fontSize: '1.4em' } }, h(Box, { sx: { color: 'warning.main', mr: 1, display: 'inline' } }, '🎲'), "Random plugin:"),
+            h(Box, { sx: { fontWeight: 'bold', fontSize: '1.4em' } }, h(Box, { sx: { color: 'warning.main', mr: 1, display: 'inline' } }, '🎲'), "随机插件:"),
             h(Box, { sx: { fontWeight: 'bold', fontSize: '1.8em', my: 1 } }, renderPluginName({ row: one })),
             h(Box, {}, one.description),
             one.preview && h('img', {
@@ -51,9 +51,9 @@ export function RandomPlugin() {
             }),
         ),
         h(CardActions, {},
-            h(Btn, { variant: 'outlined', onClick: () => installPluginFromResult(one) }, "Install"),
-            h(Btn, { variant: 'outlined', onClick: () => setIdx(x => x + 1) }, "Another"),
-            h(Btn, { variant: 'outlined', onClick() { state.hideRandomPlugin = true } }, "Hide this box"),
+            h(Btn, { variant: 'outlined', onClick: () => installPluginFromResult(one) }, "安装"),
+            h(Btn, { variant: 'outlined', onClick: () => setIdx(x => x + 1) }, "下一个"),
+            h(Btn, { variant: 'outlined', onClick() { state.hideRandomPlugin = true } }, "隐藏此区域"),
         )
     )
 }

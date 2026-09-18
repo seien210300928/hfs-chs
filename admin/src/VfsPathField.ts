@@ -28,7 +28,7 @@ export default function VfsPathField({
     }, [list, uri])
     setApi?.({
         getError() {
-            return !folders && value?.endsWith('/') && "must be a file" || false
+            return !folders && value?.endsWith('/') && "必须是文件" || false
         }
     })
     return h(Autocomplete<string, false, true, undefined>, {

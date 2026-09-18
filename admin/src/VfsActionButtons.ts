@@ -22,19 +22,19 @@ export default function VfsActionButtons({ files, pasteTo, done }: {
     return h(Fragment, {},
         h(Btn, {
             icon: ContentCut,
-            disabled: !files.length ? "Select something to cut"
-                : hasRoot ? "Cannot cut Home"
-                : _.isEqual(ids.slice().sort(), movingFiles.slice().sort()) && "Already cut",
-            title: "Cut (you can also use drag & drop to move items)",
-            'aria-label': "Cut",
+            disabled: !files.length ? "请先选择要剪切的内容"
+                : hasRoot ? "无法剪切主页"
+                : _.isEqual(ids.slice().sort(), movingFiles.slice().sort()) && "已剪切",
+            title: "剪切（也可以拖放来移动条目）",
+            'aria-label': "剪切",
             onClick() {
                 state.movingFiles = ids
-                alertDialog(h(Box, {}, "Now that this is marked for moving, click on the destination folder, and then the paste button ", h(ContentPaste)), 'info')
+                alertDialog(h(Box, {}, "现在已标记为待移动，请点击目标文件夹，然后再点击粘贴按钮 ", h(ContentPaste)), 'info')
             },
         }),
         movingFiles.length > 0 && h(Btn, {
             icon: ContentPaste,
-            disabled: !pasteTo ? "Select destination folder" : getMoveVfsError(movingFiles, pasteTo.id),
+            disabled: !pasteTo ? "请选择目标文件夹" : getMoveVfsError(movingFiles, pasteTo.id),
             title: movingFiles.join('\n'),
             async onClick() {
                 if (pasteTo && moveVfs(movingFiles, pasteTo.id))
@@ -43,9 +43,9 @@ export default function VfsActionButtons({ files, pasteTo, done }: {
         }),
         h(Btn, {
             icon: Delete,
-            title: "Delete",
-            disabled: !files.length ? "Select something to delete"
-                : hasRoot && "Cannot delete Home",
+            title: "删除",
+            disabled: !files.length ? "请先选择要删除的内容"
+                : hasRoot && "无法删除主页",
             onClick() {
                 deleteVfs(ids)
                 done?.()

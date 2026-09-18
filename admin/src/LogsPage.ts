@@ -27,10 +27,10 @@ import { ALL as COUNTRIES } from './countries'
 import { useRoutedTab } from './routing'
 
 const logLabels = {
-    log: "Served",
-    error_log: "Failed",
-    console: "Console",
-    disconnections: "Disconnections",
+    log: "请求",
+    error_log: "失败",
+    console: "控制台",
+    disconnections: "断开连接",
     ips: "IPs",
 }
 const LOG_FILES = typedKeys(logLabels)
@@ -40,17 +40,17 @@ let reloadIps: any
 export default function LogsPage({ setTitleSide }: PageProps) {
     const files = LOG_FILES
     const [tab, setTab] = useRoutedTab('logs', files)
-    const shorterLabels = !useBreakpoint('sm') && { error_log: "Not", console: h(Terminal), disconnections: h(LinkOff) }
+    const shorterLabels = !useBreakpoint('sm') && { error_log: "失败", console: h(Terminal), disconnections: h(LinkOff) }
     const file = files[tab]
     const fileAvailable = file.endsWith('log')
 
     const logInfo = useApiEx('get_log_info')
     setTitleSide(useMemo(() => fileAvailable && (logInfo.element || with_(logInfo.data, data =>
         h(Box, { sx: { fontSize: 'smaller' } },
-            `Current: ${formatBytes(_.sum(Object.values(data.current)))}`,
+            `当前: ${formatBytes(_.sum(Object.values(data.current)))}`,
             h('br'),
             with_(Object.values(data.rotated).flat(), rotatedAsArray =>
-                `Archived: ${formatBytes(_.sumBy(rotatedAsArray, 'size'))} / ${rotatedAsArray.length} files`)
+                `已归档: ${formatBytes(_.sumBy(rotatedAsArray, 'size'))} / ${rotatedAsArray.length} 个文件`)
         )
     )), [logInfo.element, logInfo.data, fileAvailable]))
 
@@ -65,11 +65,11 @@ export default function LogsPage({ setTitleSide }: PageProps) {
             h(Box, { sx: { flex: 1 } }),
             h(IconBtn, {
                 icon: Download,
-                title: fileAvailable ? "Download as file" : "Not available",
+                title: fileAvailable ? "下载为文件" : "不可用",
                 link: API_URL + `get_log_file?file=${file}`,
                 disabled: !fileAvailable
             }),
-            h(IconBtn, { icon: Settings, title: "Options", onClick: showLogOptions })
+            h(IconBtn, { icon: Settings, title: "选项", onClick: showLogOptions })
         ),
         files.map(f =>
             h(LogFile, { hidden: file !== f, file: f, key: f, fillFlex: true }) ),
@@ -77,7 +77,7 @@ export default function LogsPage({ setTitleSide }: PageProps) {
 
     function showLogOptions() {
         newDialog({
-            title: "Log options",
+            title: "日志选项",
             dialogProps: { sx: { maxWidth: '40em' } },
             Content() {
                 return h(ConfigForm, {
@@ -85,28 +85,28 @@ export default function LogsPage({ setTitleSide }: PageProps) {
                     form: {
                         stickyBar: true,
                         fields: [
-                            { k: CFG.log, label: logLabels.log, sm: 6, helperText: "Requests are logged here. Empty to disable it." },
-                            { k: CFG.error_log, label: logLabels.error_log, sm: 6, placeholder: "errors go to main log",
-                                helperText: "Write errors in a different file. Empty to use same file."
+                            { k: CFG.log, label: logLabels.log, sm: 6, helperText: "请求记录在此。留空可禁用。" },
+                            { k: CFG.error_log, label: logLabels.error_log, sm: 6, placeholder: "错误写入主日志",
+                                helperText: "将错误写入另一个文件。留空则使用同一文件。"
                             },
-                            { k: CFG.log_rotation, comp: SelectField, sm: 6, options: [{ value:'', label:"disabled" }, 'daily', 'weekly', 'monthly' ],
-                                helperText: [wikiLink('Logs#rotation', "To keep log-files smaller"), " (deletion is not automatic)"],
+                            { k: CFG.log_rotation, comp: SelectField, sm: 6, options: [{ value:'', label:"已禁用" }, 'daily', 'weekly', 'monthly' ],
+                                helperText: [wikiLink('Logs#rotation', "保持日志文件更小"), "（删除不是自动的）"],
                             },
-                            { k: CFG.dont_log_net, comp: NetmaskField, label: "Don't log address", sm: 6, placeholder: "no exception" },
-                            { k: CFG.log_gui, sm: 6, comp: BoolField, label: "Log interface loading", helperText: "Some requests are necessary to load the interface" },
-                            { k: CFG.log_api, sm: 6, comp: BoolField, label: "Log API requests", helperText: "Requests for commands" },
-                            { k: CFG.log_ua, sm: 6, comp: BoolField, label: "Log User-Agent", helperText: "Contains browser and possibly OS information. Can double the size of your logs on disk." },
+                            { k: CFG.dont_log_net, comp: NetmaskField, label: "不记录地址", sm: 6, placeholder: "无例外" },
+                            { k: CFG.log_gui, sm: 6, comp: BoolField, label: "记录界面加载", helperText: "加载界面需要一些请求" },
+                            { k: CFG.log_api, sm: 6, comp: BoolField, label: "记录 API 请求", helperText: "用于命令的请求" },
+                            { k: CFG.log_ua, sm: 6, comp: BoolField, label: "记录 User-Agent", helperText: "包含浏览器和可能的操作系统信息。可能会使磁盘上的日志体积翻倍。" },
                             { k: CFG.log_host, sm: 6, comp: BoolField, label: "Log Host header" },
-                            { k: CFG.log_spam, sm: 6, comp: BoolField, label: "Log spam requests", helperText: md`Failed requests that you probably don't want to see` },
-                            { k: CFG.track_ips, sm: 6, comp: BoolField, label: "Keep track of IPs",
+                            { k: CFG.log_spam, sm: 6, comp: BoolField, label: "记录垃圾请求", helperText: md`Failed requests that you probably don't want to see` },
+                            { k: CFG.track_ips, sm: 6, comp: BoolField, label: "跟踪 IP",
                                 parentProps: { sx: { display: 'flex', gap: 1, alignItems: 'flex-start' } },
                                 after: h(Btn, {
                                     size: 'small', variant: 'outlined', color: 'warning', sx: { mt: '4px' },
                                     confirm: true, doneMessage: true,
                                     onClick: () => apiCall('reset_ips').then(reloadIps)
-                                }, "Reset")
+                                }, "重置")
                             },
-                            { k: CFG.debug, sm: 6, comp: BoolField, label: "Debug messages in console" },
+                            { k: CFG.debug, sm: 6, comp: BoolField, label: "控制台中的调试消息" },
                         ]
                     }
                 })
@@ -123,7 +123,7 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
     const [showAgent, setShowAgent] = useState(false)
     const [showHost, setShowHost] = useState(false)
     const { pause, pauseButton } = usePauseButton()
-    const [showApi, showApiButton] = useToggleButton("Show APIs", "Hide APIs", v => ({
+    const [showApi, showApiButton] = useToggleButton("显示 API", "隐藏 API", v => ({
         icon: SmartToy,
         sx: { rotate: v ? 0 : '180deg' },
     }), true)
@@ -155,7 +155,7 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
                 }
             }
             else if (skipped) {
-                toast(`Entire log loaded, ${formatBytes(skipped)}`)
+                toast(`已加载整个日志（已跳过 ${formatBytes(skipped)}）`)
                 setSkipped(0)
             }
             // older file batches must not reuse the IDs of rows already displayed
@@ -172,7 +172,7 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
         reloadIps = reload
     const tsColumn: DataTableColumn = {
         field: 'ts',
-        headerName: "Timestamp",
+        headerName: "时间戳",
         type: 'dateTime',
         width: 96,
         valueGetter: v => new Date(v),
@@ -180,7 +180,7 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
     }
     const ipColumn: DataTableColumn = {
         field: 'ip',
-        headerName: "Address",
+        headerName: "地址",
         flex: .6,
         minWidth: 130,
         maxWidth: 230,
@@ -205,23 +205,23 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
         compact: true,
         actionsProps: { hideUnder: 'md' },
         actions: isConsole ? undefined : (({ row }) => onlyTruthy([
-            h(BlockIpBtn, { ip: row.ip, comment: "From log" }),
+            h(BlockIpBtn, { ip: row.ip, comment: "来自日志" }),
             isIps && h(Btn, {
                 icon: Delete,
                 confirm: true,
-                title: `Delete ${row.ip}`,
+                title: `删除 ${row.ip}`,
                 doneMessage: true,
                 onClick: () => apiCall('delete_ips', { ip: row.ip }).then(() => setList(was => was.filter(x => x.ip !== row.ip)))
             }),
             isIps && h(Btn, {
                 icon: AutoDelete,
                 confirm: true,
-                title: `Delete all records up to ${formatTimestamp(row.ts)}`,
-                onClick: () => apiCall('delete_ips', { ts: row.ts }).then(res => toast(`${res.n} deleted`)).then(reload)
+                title: `删除截至 ${formatTimestamp(row.ts)} 的所有记录`,
+                onClick: () => apiCall('delete_ips', { ts: row.ts }).then(res => toast(`${res.n} 已删除`)).then(reload)
             }),
             hasFile && h(Btn, {
                 icon: ContentCopy,
-                title: "Copy request",
+                title: "复制请求",
                 doneAnimation: true,
                 onClick: () => copyTextToClipboard(JSON.stringify(_.omit(row, 'id'), undefined, 2))
             })
@@ -236,22 +236,22 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
                 variant: 'outlined',
                 sx: { ml: { sm: 1 } },
                 labelIf: width > 700,
-                title: `Only ${formatBytes(MAX)} was loaded, for speed. Total size is ${formatBytes(totalSize)}`,
+                title: `为了速度仅加载了 ${formatBytes(MAX)}。总大小为 ${formatBytes(totalSize)}`,
                 loading: !limited,
                 onClick: () => setLimited(false)
-            }, "Load whole log"),
+            }, "加载完整日志"),
             footerSide,
         ),
         columns: isConsole ? [
             tsColumn,
             {
                 field: 'k',
-                headerName: "Level",
+                headerName: "级别",
                 hideUnder: 'sm',
             },
             {
                 field: 'msg',
-                headerName: "Message",
+                headerName: "消息",
                 flex: 1,
                 mergeRender: { k: { override: { valueFormatter: (value) => value !== 'log' && value } } }
             }
@@ -267,7 +267,7 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
                 renderCell: ({ row, value }) => value >= 0 && `✅ ${row.served}\n 🚫 ${row.failed}`,
             },
             {
-                headerName: "Country",
+                headerName: "国家/地区",
                 field: 'country',
                 flex: 1,
                 hideUnder: !showCountry || 'md',
@@ -276,21 +276,21 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
             },
             !isIps && {
                 field: 'msg',
-                headerName: "Message",
+                headerName: "消息",
                 flex: 4,
             }
         ] : [
             ipColumn,
             {
-                headerName: "Country",
+                headerName: "国家/地区",
                 field: 'country',
                 valueGetter: (_value, row) => row.extra?.country,
                 hideUnder: !showCountry || 'xl',
                 renderCell: ({ value }) => h(Country, { code: value, def: '-' }),
             },
             {
-                field: 'user',
-                headerName: "Username",
+                field: '用户',
+                headerName: "用户名",
                 flex: .3,
                 maxWidth: 200,
                 hideUnder: 'xl',
@@ -298,28 +298,28 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
             tsColumn,
             {
                 field: 'method',
-                headerName: "Method",
+                headerName: "方法",
                 width: 80,
                 hideUnder: 'xl',
             },
             {
                 field: 'status',
-                headerName: "Code",
+                headerName: "代码",
                 type: 'number',
                 width: 70,
                 hideUnder: 'xl',
-                renderCell: ({ value }) => hTooltip(prefix(value + ' - ', httpCodes[value]) || "Unknown", undefined,
+                renderCell: ({ value }) => hTooltip(prefix(value + ' - ', httpCodes[value]) || "未知", undefined,
                     h(Box, { sx: { bgcolor: '#888a', color: '#fff', borderRadius: '.3em', p: '.05em .3em', lineHeight: '1.2em' } }, value))
             },
             {
                 field: 'length',
-                headerName: "Size",
+                headerName: "大小",
                 type: 'number',
                 hideUnder: 'md',
                 valueFormatter: (value) => formatBytes(value as number)
             },
             {
-                headerName: "Agent",
+                headerName: "客户端",
                 field: 'ua',
                 width: 60,
                 hideUnder: !showAgent || 'md',
@@ -335,7 +335,7 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
             },
             {
                 field: 'notes',
-                headerName: "Notes",
+                headerName: "备注",
                 width: 110,
                 hideUnder: 'sm',
                 cellClassName: 'wrap',
@@ -363,7 +363,7 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
             {
                 field: 'agentText',
                 valueGetter: (_value: any, row: any) => row.extra?.ua,
-                headerName: "Agent text",
+                headerName: "客户端标识",
                 flex: 2,
                 hideUnder: true,
             },
@@ -385,12 +385,12 @@ export function LogFile({ file, footerSide, hidden, limit, filter, ...rest }: Lo
             if (upload)
                 row.length =  (extra?.size ?? 0)
                     + (!partial && Number(row.uri.match(/\?.*resume=(\d+)/)?.[1]) || 0) // show full size for full uploads
-            row.notes = extra?.dl ? "full download " + (extra.speed ? formatSpeed(extra.speed, { sep: ' ' }) : '') // 'dl' here is not the '?dl' of the url, and has a different meaning
-                : upload ? `${partial ? "partial " : ""} upload ${extra.speed ? formatSpeed(extra.speed, { sep: ' ' }) : ''}`
-                    : row.status === HTTP_UNAUTHORIZED && row.uri?.startsWith(API_URL + 'loginSrp') ? "login failed" + prefix(':\n', extra?.u)
+            row.notes = extra?.dl ? "完整下载 " + (extra.speed ? formatSpeed(extra.speed, { sep: ' ' }) : '') // 'dl' here is not the '?dl' of the url, and has a different meaning
+                : upload ? `${partial ? "部分 " : ""} 上传 ${extra.speed ? formatSpeed(extra.speed, { sep: ' ' }) : ''}`
+                    : row.status === HTTP_UNAUTHORIZED && row.uri?.startsWith(API_URL + 'loginSrp') ? "登录失败" + prefix(':\n', extra?.u)
                         : _.map(extra?.params, (v, k) => `${k}: ${v}\n`).join('') + (row.notes || '')
             if (extra?.aborted)
-                row.notes += ' (aborted)'
+                row.notes += '（已中止）'
         }
         return row
     }
@@ -412,3 +412,4 @@ function parseLogLine(line: string, id: number) {
         extra: tryJson(tryJson(extra)) || undefined,
     }
 }
+

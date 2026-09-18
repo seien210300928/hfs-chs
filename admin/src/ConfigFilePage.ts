@@ -12,7 +12,7 @@ import { DisplayField } from '@hfs/mui-grid-form'
 import { adminApis } from '../../src/adminApis'
 
 export default function ConfigFilePage() {
-    state.title = "Config file"
+    state.title = "配置文件"
     const { data, reload, element } = useApiEx<typeof adminApis.get_config_text>('get_config_text', {})
     const [text, setText] = useState<string | undefined>()
     const [saved, setSaved] = useState<string | undefined>()
@@ -24,16 +24,16 @@ export default function ConfigFilePage() {
     }, [data])
     return element || h(Fragment, {},
         h(Flex, { flexWrap: 'wrap', justifyContent: 'space-between' },
-            h(Btn, { icon: Download, onClick: exportConfig, disabled: !data }, "Export without passwords"),
+            h(Btn, { icon: Download, onClick: exportConfig, disabled: !data }, "导出（不含密码）"),
             edit ? h(Fragment, {},
                 reloadBtn(reload),
                 h(IconBtn, {
                     icon: Save,
-                    title: "Save\n(ctrl+enter)",
+                    title: "保存\n(ctrl+enter)",
                     modified: text !== saved,
                     onClick: save,
                 }),
-                h(Alert, { severity: 'warning', sx: { minWidth: '10em' } }, "Be careful, you can easily break things here"),
+                h(Alert, { severity: 'warning', sx: { minWidth: '10em' } }, "请小心，这里很容易把配置弄坏"),
             ) : h(Btn, {
                 icon: Edit,
                 variant: 'outlined',
@@ -41,8 +41,8 @@ export default function ConfigFilePage() {
                     setEdit(true)
                     setTimeout(() => focusSelector('main textarea'), 500)
                 }
-            }, "Edit"),
-            h(Box, { sx: { flex: 1, minWidth: 'fit-content' } }, h(DisplayField, { label: "File path", value: data?.fullPath, size: 'small' }))
+            }, "编辑"),
+            h(Box, { sx: { flex: 1, minWidth: 'fit-content' } }, h(DisplayField, { label: "文件路径", value: data?.fullPath, size: 'small' }))
         ),
         element || text !== undefined && // avoids bad undo behavior on start
             h(Box, { sx: { '& pre,& textarea': { wordBreak: 'break-all !important' } } }, // fixes long lines not wrapping at the right point when the side menu is visible

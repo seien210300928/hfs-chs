@@ -10,24 +10,24 @@ export type MoveVfsSources = string | readonly string[]
 export function getMoveVfsError(from: MoveVfsSources, to: string) {
     const fromUris = normalizeMoveSources(from)
     if (fromUris.includes('/'))
-        return "Cannot move root"
+        return "无法移动根目录"
     const topLevelUris = getTopLevelMoveSources(fromUris)
     const fromNodes = onlyTruthy(topLevelUris.map(uri => id2vfsNode.get(uri)))
     if (fromNodes.length !== topLevelUris.length)
-        return "Item to move not found"
+        return "未找到要移动的条目"
     const toNode = id2vfsNode.get(to)
     if (!toNode || toNode.type !== 'folder')
-        return "Destination folder not found"
+        return "未找到目标文件夹"
     if (topLevelUris.some(uri => isDescendantUri(to, uri)))
-        return "Cannot move inside itself"
+        return "不能移动到自身内部"
     if (topLevelUris.every(uri => isDirectChildOf(uri, to)))
-        return "Already in this folder"
+        return "已在此文件夹中"
     if (_.uniqBy(fromNodes, node => normalizeName(node.name)).length !== fromNodes.length)
-        return "Some selected items have the same name"
+        return "某些选定项目具有相同的名称"
     if (fromNodes.some(fromNode => toNode.children?.some(x => normalizeName(x.name) === normalizeName(fromNode.name) && x.id !== fromNode.id)))
-        return "Item with same name already present in destination"
+        return "目标位置已存在同名条目"
     if (fromNodes.some(fromNode => !fromNode.parent?.children))
-        return "Source parent not found"
+        return "未找到源父级"
 
     function normalizeName(name: string) {
         return normalizeFilenameForPlatform(name, getHFS().platform)

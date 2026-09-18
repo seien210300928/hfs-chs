@@ -12,14 +12,14 @@ import { basename, extname, focusSelector, getHFS, Optional } from '@hfs/shared'
 let lastFolder: undefined | string
 export default function addFiles() {
     const { close } = newDialog({
-        title: "Add files or folders",
+        title: "添加文件或文件夹",
         dialogProps: { sx:{ minWidth: 'min(80vw, 40em)', minHeight: 'calc(100vh - 9em)' } },
         Content() {
             const parent = getFolderFromSelected()
             return h(Fragment, {},
                 h(Box, { sx:{ typography: 'body1', px: 1, py: 2 } },
-                    "Selected elements will be added under ",
-                    parent.isRoot ? h('i', {}, "Home") : decodeURI(parent.id)
+                    "所选元素将添加到 ",
+                    parent.isRoot ? h('i', {}, "主页") : decodeURI(parent.id)
                 ),
                 h(FilePicker, {
                     from: lastFolder ?? parent.source,
@@ -71,7 +71,7 @@ function isSameFilenameAs(name: string) {
 
 export async function addVirtual() {
     try {
-        let name = await promptDialog("Enter folder name")
+        let name = await promptDialog("输入文件夹名称")
         if (!name) return
         const parent = getFolderFromSelected()
         name = getFreeName(parent, name)
@@ -86,10 +86,10 @@ export async function addVirtual() {
 export async function addLink() {
     try {
         const parent = getFolderFromSelected()
-        const name = getFreeName(parent, 'new link')
+        const name = getFreeName(parent, '新链接')
         if (!name) return
         addNodes(parent, [{ name, url: 'https://example.com' }])
-        toast("Link created", 'success', {
+        toast("链接已创建", 'success', {
             onClose: () => focusSelector('input[name=url]')
         })
     }

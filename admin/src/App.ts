@@ -96,7 +96,7 @@ function Routed() {
             set(null)
     })
     return h(Fragment, {},
-        h(AriaOnly, {}, h('h1', {}, "Admin-panel")),
+        h(AriaOnly, {}, h('h1', {}, "管理面板")),
         !sideMenu && h(StickyBar, {
             title,
             titleSide,
@@ -156,7 +156,7 @@ function StickyBar({ title, titleSide, openMenu, props }: { props?: BoxProps, ti
                 edge: 'start',
                 color: 'inherit',
                 sx: { mr: 2 },
-                'aria-label': "menu",
+                'aria-label': "菜单",
                 onClick: openMenu
             }, h(Menu)),
             h(Flex, {

@@ -26,7 +26,7 @@ export async function importAccountsCsv(cb?: () => void) {
             overwriteExistingAccounts: false,
         }
         const cfg = await formDialog<typeof initialConfig, typeof initialConfig>({
-            title: "Import accounts from CSV",
+            title: "从 CSV 导入账户",
             dialogProps: { maxWidth: 'sm' },
             values: initialConfig,
             form: values => {
@@ -34,25 +34,25 @@ export async function importAccountsCsv(cb?: () => void) {
                 const row = rows[values.skipFirstLines || 0] || []
                 const rec = getRec(row, { ...initialConfig, ...values })
                 return {
-                    save: { startIcon: h(Upload), children: 'Go' },
+                    save: { startIcon: h(Upload), children: '开始' },
                     fields: [
-                        h(Box, { sx: { p: 1 } }, "Total lines:", rows.length),
+                        h(Box, { sx: { p: 1 } }, "总行数:", rows.length),
                         { k: 'skipFirstLines', comp: NumberField, max: rows.length-1, typing: true, md: 6,
-                            getError: value => value != null && !Number.isInteger(value) && "Enter an integer",
-                            helperText: h(Fragment, {}, "First line: ", h('code', {}, row.join(', ')) ),
+                            getError: value => value != null && !Number.isInteger(value) && "请输入整数",
+                            helperText: h(Fragment, {}, "首行: ", h('code', {}, row.join(', ')) ),
                         },
                         { k: 'overwriteExistingAccounts', comp: BoolField, md: 6 },
                         { k: 'usernameColumn', ...colField,
-                            helperText: h(Fragment, {}, "First username: ", rec.u),
+                            helperText: h(Fragment, {}, "首个用户名: ", rec.u),
                         },
                         { k: 'passwordColumn', ...colField,
-                            helperText: h(Fragment, {}, "First password: ", rec.p),
+                            helperText: h(Fragment, {}, "首个密码: ", rec.p),
                         },
                         { k: 'groupColumn', ...colField,
-                            helperText: h(Fragment, {}, "First group: ", rec.g),
+                            helperText: h(Fragment, {}, "首个组: ", rec.g),
                         },
                         { k: 'redirectColumn', ...colField,
-                            helperText: h(Fragment, {}, "First redirect: ", rec.r),
+                            helperText: h(Fragment, {}, "首个重定向: ", rec.r),
                         },
                     ],
                 }
@@ -60,7 +60,7 @@ export async function importAccountsCsv(cb?: () => void) {
         })
         if (!cfg) return
         const { close } = newDialog({
-            title: "Importing...",
+            title: "正在导入...",
             Content() {
                 const [progress, setProgress] = useState(0)
                 const [record, setRecord] = useState<undefined | ReturnType<typeof getRec>>()
@@ -101,10 +101,10 @@ export async function importAccountsCsv(cb?: () => void) {
                         finally {
                             close()
                             const good = worked - bad - already
-                            const msg = "Results: " + [
-                                prefix('', bad, " failed"),
-                                prefix('', good, " succeeded"),
-                                prefix('', already, " skipped because already present"),
+                            const msg = "结果：" + [
+                                prefix('', bad, " 失败"),
+                                prefix('', good, " 成功"),
+                                prefix('', already, " 已跳过（已存在）"),
                             ].filter(Boolean).join(', ')
                             alertDialog(msg, !good && bad ? 'error' : (bad || already) ? 'warning' : 'success')
                             cb?.()

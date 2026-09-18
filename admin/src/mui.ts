@@ -65,7 +65,7 @@ export function IconProgress({ icon, progress, offset, title, sx }: IconProgress
             size: 32,
             sx: { position: 'absolute' },
         }),
-        hTooltip(title ?? (_.isNumber(progress) ? formatPerc(progress) : "Size unknown"), '',
+        hTooltip(title ?? (_.isNumber(progress) ? formatPerc(progress) : "大小未知"), '',
             h(CircularProgress, {
                 color: 'success',
                 value: (offset || 1e-7) * 100,
@@ -104,11 +104,11 @@ export function wikiLink(uri: string, content: ReactNode) {
 }
 
 export function WildcardsSupported() {
-    return wikiLink('Wildcards', "Wildcards supported")
+    return wikiLink('Wildcards', "支持通配符")
 }
 
 export function reloadBtn(onClick: any, props?: any) {
-    return h(IconBtn, { icon: Refresh, title: "Reload", onClick, ...props })
+    return h(IconBtn, { icon: Refresh, title: "重新加载", onClick, ...props })
 }
 
 export function useCtrlShortcutButton(keys: readonly string[]) {
@@ -182,7 +182,7 @@ export const Btn = forwardRef(({ icon, title, onClick, disabled, progress, link,
         'aria-hidden': disabled,
         async onClick(...args: any[]) {
             if (loadingState) return
-            if (confirm && !await confirmDialog(confirm === true ? "Are you sure?" : confirm)) return
+            if (confirm && !await confirmDialog(confirm === true ? "确定吗？" : confirm)) return
             try {
                 const ret = onClick?.apply(this, args as any)
                 if (ret instanceof Promise)
@@ -233,7 +233,7 @@ export function execDoneMessage(msg: boolean | string | undefined, el?: HTMLElem
     if (el)
         restartAnimation(el, 'success .5s')
     if (msg)
-        toast(msg === true ? "Operation completed" : msg, 'success')
+        toast(msg === true ? "操作完成" : msg, 'success')
 }
 
 export function iconTooltip(icon: SvgIconComponent, tooltip: ReactNode, sx?: SxProps, props?: SvgIconProps) {
@@ -275,7 +275,7 @@ export function LinkBtn({ ...rest }: LinkProps) {
 }
 
 export function usePauseButton(name='', def: ToggleButtonDefault=true, props?: Partial<IconBtnProps>) {
-    const [going, btn] = useToggleButton(`Pause ${name}`, `Resume ${name}`, v => ({
+    const [going, btn] = useToggleButton(name ? `暂停${name}` : "暂停", name ? `继续${name}` : "继续", v => ({
         icon: v ? PauseCircle : PlayCircle,
         sx: { rotate: v ? '180deg' : '0deg' },
         ...props,
@@ -315,16 +315,16 @@ export function NetmaskField({ setApi, helperText, ...props }: StringFieldProps)
     const warned = useRef(false)
     setApi?.({
         getError() {
-            return props.value && apiCall('validate_net_mask', { mask: props.value }).then(x => !x.result && "Invalid mask")
+            return props.value && apiCall('validate_net_mask', { mask: props.value }).then(x => !x.result && "无效的掩码")
         }
     })
     return h(StringField, {
-        helperText: h('span', {}, helperText, helperText && ' – ', wikiLink('Wildcards#network-masks', "Wildcards supported")),
+        helperText: h('span', {}, helperText, helperText && ' – ', wikiLink('Wildcards#network-masks', "支持通配符")),
         ...props,
         onTyping(v) {
             if (!warned.current && v?.includes('127.0.0.1') && !v.includes('::1')) {
                 warned.current = true
-                alertDialog(`Hostname "localhost" is normally translated as ::1 instead of 127.0.0.1`, 'warning')
+                alertDialog(`主机名 "localhost" 通常会被解析为 ::1 而不是 127.0.0.1`, 'warning')
             }
             return props.onTyping?.(v) ?? v
         },

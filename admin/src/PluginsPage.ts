@@ -7,9 +7,9 @@ import OnlinePlugins from './OnlinePlugins'
 import { useRoutedTab } from './routing'
 
 const TABS = [
-    { label: "Installed", path: 'installed', Pane: InstalledPlugins },
-    { label: "Get more", path: 'get', Pane: OnlinePlugins },
-    { label: "Check updates", path: 'updates', Pane: () => h(InstalledPlugins, { updates: true }) },
+    { label: "已安装", path: 'installed', Pane: InstalledPlugins },
+    { label: "获取更多", path: 'get', Pane: OnlinePlugins },
+    { label: "检查更新", path: 'updates', Pane: () => h(InstalledPlugins, { updates: true }) },
 ]
 const TAB_PATHS = TABS.map(x => x.path)
 export default function PluginsPage() {

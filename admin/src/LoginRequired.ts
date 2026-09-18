@@ -13,8 +13,8 @@ export function LoginRequired({ children }: any) {
     const { loginRequired } = useSnapState()
     if (loginRequired === HTTP_FORBIDDEN)
         return h(Center, {},
-            h(Alert, { severity: 'error' }, "Admin-panel only for localhost"),
-            h(Box, { sx: { mt: 2, fontSize: 'small' } }, "because no admin account was configured")
+            h(Alert, { severity: 'error' }, "管理面板仅限 localhost 访问"),
+            h(Box, { sx: { mt: 2, fontSize: 'small' } }, "因为没有配置管理员账户")
         )
     if (loginRequired)
         return h(LoginForm)
@@ -38,12 +38,12 @@ function LoginForm() {
             fields: [
                 { k: 'username', autoComplete: 'username', autoFocus: true, required: true },
                 { k: 'password', type: 'password', autoComplete: 'current-password', required: true },
-                { k: ALLOW_SESSION_IP_CHANGE, comp: BoolField, label: "Allow IP change during this session" },
+                { k: ALLOW_SESSION_IP_CHANGE, comp: BoolField, label: "允许本次会话期间更换 IP" },
             ],
             addToBar: [ error && h(Alert, { severity: 'error', sx: { flex: 1 } }, error) ],
             saveOnEnter: true,
             save: {
-                children: "Enter",
+                children: "登录",
                 startIcon: null,
                 async onClick() {
                     try {
@@ -63,13 +63,13 @@ function LoginForm() {
 
 async function login(username: string, password: string, extra?: object) {
     const res = await withSrpLib(srpClientSequence)(username, password, apiCall, extra).catch(err => {
-        throw err?.code === HTTP_UNAUTHORIZED ? err.message || "Wrong username or password"
-            : err === 'trust' ? "Login aborted: server identity cannot be trusted"
-            : err?.name === 'AbortError' ? "Server didn't respond"
-            : (err?.message || "Unknown error")
+        throw err?.code === HTTP_UNAUTHORIZED ? err.message || "用户名或密码错误"
+            : err === 'trust' ? "登录中止：无法信任服务器身份"
+            : err?.name === 'AbortError' ? "服务器无响应"
+            : (err?.message || "未知错误")
     })
     if (!res.isAdmin)
-        throw "This account has no Admin access"
+        throw "此账户没有管理权限"
 
     // login was successful, update state
     state.loginRequired = false

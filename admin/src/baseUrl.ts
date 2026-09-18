@@ -18,19 +18,19 @@ export async function changeBaseUrl() {
         urls.push(..._.difference(domainsFromRoots.map(x => proto + x), urls))
         return await new Promise(resolve => {
             const { close } = newDialog({
-                title: "Main address",
+                title: "主地址",
                 Content() {
                     const [v, setV] = useState(base_url || '')
                     const proto = stringBefore('//', v || urls[0]) + '//'
                     const host = urls.includes(v) ? '' : v.slice(proto.length)
                     const check = h(Check, { sx: { ml: 2 } })
                     return h(Box, { sx: { display: 'flex', flexDirection: 'column' } },
-                        h(Box, { sx: { mb: 2 } }, "Choose a main address for your links"),
+                        h(Box, { sx: { mb: 2 } }, "为您的链接选择主地址"),
                         h(MenuList, {},
                             h(MenuItem, {
                                 selected: !v,
                                 onClick: () => set(''),
-                            }, "Automatic", !v && check),
+                            }, "自动", !v && check),
                             urls.map(u => h(MenuItem, {
                                 key: u,
                                 selected: u === v,
@@ -38,13 +38,13 @@ export async function changeBaseUrl() {
                             }, u, u === v && check))
                         ),
                         h(StringField, {
-                            label: "Custom IP or domain",
-                            helperText: md("You can type any address but *you* are responsible to make the address work.\nThis functionality is just to help you copy the link in case you have a domain or a complex network configuration."),
+                            label: "自定义 IP 或域名",
+                            helperText: md("您可以输入任意地址，但*您*需要自行保证该地址可用。\n此功能只是帮助您在拥有域名或复杂网络配置时复制链接。"),
                             value: host,
                             onChange: v => set(prefix(proto, ipForUrl(v))),
                             start: h(SelectField as Field<string>, {
                                 value: proto,
-                                onChange: v => host ? set(v + host) : toast("Enter domain first"),
+                                onChange: v => host ? set(v + host) : toast("请先输入域名"),
                                 options: ['http://','https://'],
                                 size: 'small',
                                 variant: 'standard',
@@ -55,7 +55,7 @@ export async function changeBaseUrl() {
                         h(Box, { sx: { mt: 2, textAlign: 'right' } },
                             h(Btn, {
                                 icon: Save,
-                                children: "Save",
+                                children: "保存",
                                 async onClick() {
                                     if (v !== base_url)
                                         await apiCall('set_config', { values: { [CFG.base_url]: v.replace(/\/$/, '') } })

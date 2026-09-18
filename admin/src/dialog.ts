@@ -53,7 +53,7 @@ dialogsDefaults.Container = function Container(d: DialogOptions) {
         },
             d.icon && componentOrNode(d.icon),
             h(Box, { sx: { flex: 1, minWidth: 40, ml: 1 } }, componentOrNode(d.title)),
-            d.closable && h(IconBtn, { icon: Close, title: "Close", onClick: () => closeDialog() }),
+            d.closable && h(IconBtn, { icon: Close, title: "关闭", onClick: () => closeDialog() }),
         ),
         h(DialogContent, {
             ref,
@@ -93,7 +93,7 @@ export function alertDialog(msg: ReactElement | string | Error, options?: AlertT
         className: 'dialog-alert dialog-alert-' + type,
         icon: opt.icon ?? h(type2ico[type], { color: type }),
         onClose: promise.resolve,
-        title: _.upperFirst(type),
+        title: ({ error: "错误", warning: "警告", info: "信息", success: "成功" } as any)[type] ?? _.upperFirst(type),
         dialogProps: { fullScreen: false },
         ...rest,
         Content() {
@@ -114,7 +114,7 @@ interface ConfirmOptions extends Omit<DialogOptions, 'Content'> {
     after?: FC<{ onClick: (result: any) => unknown }>
 }
 
-export function confirmDialog(msg: ReactNode, { href, trueText="Go", falseText="Don't", before, after,  ...rest }: ConfirmOptions={}) {
+export function confirmDialog(msg: ReactNode, { href, trueText="继续", falseText="取消", before, after,  ...rest }: ConfirmOptions={}) {
     const promise = pendingPromise<boolean>()
     const dialog = newDialog({
         className: 'dialog-confirm',
@@ -227,14 +227,14 @@ export async function promptDialog(msg: ReactNode, { value='', field, save, addT
                 { k: 'text', label: null, autoFocus: true, ...field, before: h(Box, { sx: { mb: 2 } }, msg) },
             ],
             save: {
-                children: "Continue",
+                children: "继续",
                 startIcon: h(Forward),
                 ...save,
             },
             saveOnEnter: true,
             barSx: { gap: 2 },
             addToBar: [
-                h(Button, { onClick: closeDialog }, "Cancel"),
+                h(Button, { onClick: closeDialog }, "取消"),
                 ...addToBar,
             ],
             ...props.form,

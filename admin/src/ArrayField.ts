@@ -70,7 +70,7 @@ export function ArrayField<T extends object>({
                 hideFooterSelectedRowCount: true,
                 hideFooter: true,
                 slots: {
-                    noRowsOverlay: () => h(Center, {}, noRows || "No entries"),
+                    noRowsOverlay: () => h(Center, {}, noRows || "无记录"),
                 },
                 slotProps: {
                     pagination: {
@@ -108,7 +108,7 @@ export function ArrayField<T extends object>({
                         width: 90,
                         headerAlign: 'center' as GridAlignment,
                         renderHeader(){
-                            const title = "Add"
+                            const title = "添加"
                             return h(Fragment, {},
                                 h(IconBtn, {
                                     icon: Add,
@@ -130,7 +130,7 @@ export function ArrayField<T extends object>({
                                 }),
                                 undo !== undefined && h(IconBtn, {
                                     icon: Undo,
-                                    title: "Undo",
+                                    title: "撤销",
                                     size: 'small',
                                     onClick: ev => set(undo!, ev)
                                 }),
@@ -138,7 +138,7 @@ export function ArrayField<T extends object>({
                         },
                         getActions({ row }) {
                             const { $idx=row.id } = row
-                            const title = "Modify"
+                            const title = "修改"
                             return [
                                 h(GridActionsCellItem as any, {
                                     key: 'edit',
@@ -156,7 +156,7 @@ export function ArrayField<T extends object>({
                                                 }
                                             } || applyButton && {
                                                 addToBar: h(ApplyButton, {
-                                                    children: "Apply",
+                                                    children: "应用",
                                                     sx: { ml: 2, ...applyButton.sx },
                                                     ...applyButton,
                                                     onClick() {
@@ -178,7 +178,7 @@ export function ArrayField<T extends object>({
                                 h(GridActionsCellItem as any, {
                                     key: 'delete',
                                     icon: h(Delete),
-                                    label: "Delete",
+                                    label: "删除",
                                     showInMenu: reorder,
                                     onClick(ev: any) {
                                         ev.stopPropagation()
@@ -188,7 +188,7 @@ export function ArrayField<T extends object>({
                                 reorder && $idx && h(GridActionsCellItem as any, {
                                     key: 'up',
                                     icon: h(ArrowUpward),
-                                    label: "Move up",
+                                    label: "上移",
                                     showInMenu: true,
                                     onClick(ev: any) {
                                         ev.stopPropagation()
@@ -198,7 +198,7 @@ export function ArrayField<T extends object>({
                                 reorder && $idx < rows.length - 1 && h(GridActionsCellItem as any, {
                                     key: 'down',
                                     icon: h(ArrowDownward),
-                                    label: "Move down",
+                                    label: "下移",
                                     showInMenu: true,
                                     onClick(ev: any) {
                                         ev.stopPropagation()

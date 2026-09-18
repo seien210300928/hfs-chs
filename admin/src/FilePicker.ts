@@ -61,10 +61,10 @@ export default function FilePicker({ onSelect, multiple=true, files=true, folder
     const isRoot = cwd.length < 2
     return h(Fragment, {},
         h(StringField, {
-            label: "Current folder",
+            label: "当前文件夹",
             value: cwd,
             InputLabelProps: { shrink: true },
-            helperText: "UNC paths are supported",
+            helperText: "支持 UNC 路径",
             async onChange(v) {
                 if (!v)
                     return setCwd(root)
@@ -76,7 +76,7 @@ export default function FilePicker({ onSelect, multiple=true, files=true, folder
             },
             end: h(Fragment, {},
                 h(IconBtn, {
-                    title: "root",
+                    title: "根目录",
                     disabled: isRoot,
                     icon: VerticalAlignTop,
                     onClick() {
@@ -84,7 +84,7 @@ export default function FilePicker({ onSelect, multiple=true, files=true, folder
                     }
                 }),
                 h(IconBtn, {
-                    title: "parent folder",
+                    title: "上一级文件夹",
                     disabled: isRoot,
                     icon: ArrowUpward,
                     onClick() {
@@ -108,7 +108,7 @@ export default function FilePicker({ onSelect, multiple=true, files=true, folder
                     },
                     sx: { flex: 1, display: 'flex', flexDirection: 'column' }
                 },
-                    !list.length ? h(Center as any, { sx: { flex: 1, mt: '4em' } }, connecting ? spinner() : "No elements in this folder")
+                    !list.length ? h(Center as any, { sx: { flex: 1, mt: '4em' } }, connecting ? spinner() : "此文件夹中没有元素")
                         : h(FixedSizeList, {
                             width: '100%', height: listHeight,
                             itemSize: 46, itemCount: filteredList.length, overscanCount: 5,
@@ -148,23 +148,23 @@ export default function FilePicker({ onSelect, multiple=true, files=true, folder
                         onClick() {
                             onSelect(sel.length ? sel.map(x => cwdDelimiter + x) : [cwdDelimiter])
                         }
-                    }, files && (sel.length || !folders) ? `Select (${sel.length})` : sm ? "Select this folder" : "This folder"),
+                    }, files && (sel.length || !folders) ? `选择 (${sel.length})` : sm ? "选择此文件夹" : "此文件夹"),
                     folders && h(Btn, {
                         icon: CreateNewFolder,
                         variant: 'outlined',
                         doneMessage: true,
                         labelIf: 'sm',
                         async onClick() {
-                            const s = await promptDialog("New folder name")
+                            const s = await promptDialog("新建文件夹名称")
                             if (!s) return false
                             await apiCall('mkdir', { path: `${cwd}/${s}` })
                             reload()
                         }
-                    }, "New folder"),
+                    }, "新建文件夹"),
                     h(TextField, {
                         size: 'small',
                         value: filter,
-                        label: `Filter results (${filteredList.length}${filteredList.length < list.length ? '/'+list.length : ''})`,
+                        label: `筛选结果 (${filteredList.length}${filteredList.length < list.length ? '/'+list.length : ''})`,
                         onChange(ev) {
                             setFilter(ev.target.value)
                         },
@@ -182,7 +182,7 @@ export default function FilePicker({ onSelect, multiple=true, files=true, folder
 }
 
 export function formatDiskSpace({ free, total }: { free: number, total: number }) {
-    return `${formatBytes(free)} available (${formatPerc(free / total)}) of ${formatBytes(total)}`
+    return `${formatBytes(free)} 可用（${formatPerc(free / total)}），共 ${formatBytes(total)}`
 }
 
 export function ListLsItem({ it }: { it: LsEntry }) {

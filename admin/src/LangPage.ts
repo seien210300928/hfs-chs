@@ -16,12 +16,12 @@ export default function LangPage({ setTitleSide }: PageProps) {
     const { list, error, connecting, initializing, reload } = useApiList('get_langs')
     const langs = useMemo(() => ['en', ..._.uniq(list.map(x => x.code))], [list])
     setTitleSide(useMemo(() =>
-        h(Alert, { severity: 'info', sx: { display: { xs: 'none', sm: 'inherit' }  } }, "Translation is limited to the Front-end and doesn't apply to the Admin-panel"),
+        h(Alert, { severity: 'info', sx: { display: { xs: 'none', sm: 'inherit' }  } }, "翻译仅适用于前端，不适用于管理面板"),
         []))
     return h(Fragment, {},
         h(Box, { sx: { mt: 1, maxWidth: '50em', flex: 1, ...fillFlexParentSx } },
             h(Box, { sx: { mb: 1, display: 'flex' } },
-                h(Btn, { icon: Upload, onClick: add }, "Add"),
+                h(Btn, { icon: Upload, onClick: add }, "添加"),
                 h(Box, { sx: { flex: 1 } }),
                 h(ForceLang, { langs }),
             ),
@@ -52,13 +52,13 @@ export default function LangPage({ setTitleSide }: PageProps) {
                 actions: ({ row }) => [
                     h(IconBtn, {
                         icon: Delete,
-                        title: row.embedded ? "Cannot delete (embedded)" : "Delete",
-                        confirm: `Delete language code "${row.code}"?`,
+                        title: row.embedded ? "无法删除（内置）" : "删除",
+                        confirm: `删除语言代码 "${row.code}"？`,
                         disabled: row.embedded,
                         async onClick() {
                             await apiCall('del_lang', _.pick(row, 'code'))
                             reload()
-                            toast("Deleted")
+                            toast("已删除")
                         }
                     }),
                 ]
@@ -79,7 +79,7 @@ export default function LangPage({ setTitleSide }: PageProps) {
             if (failed.length)
                 await alertDialog(failed.join('.\n'), 'error')
             else
-                toast("Loaded")
+                toast("已加载")
         }, { accept: '.json' })
     }
 }
@@ -105,8 +105,8 @@ function ForceLang({ langs }: { langs: string[] }) {
             finally { setSaving(undefined) }
         },
         options: [
-            { label: "Respect browser language", value: '' },
-            ...langs.map(x => ({ value: x, label: "Force language: " + x }))
+            { label: "遵循浏览器语言", value: '' },
+            ...langs.map(x => ({ value: x, label: "强制语言：" + x }))
         ]
     })
 }

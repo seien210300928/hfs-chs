@@ -25,7 +25,7 @@ import { adminApis } from '../../src/adminApis'
 
 export default function MonitorPage({ setTitleSide }: PageProps) {
     setTitleSide(useMemo(() =>
-            h(Alert, { severity: 'info', sx: { display: { xs: 'none', sm: 'inherit' }  } }, "If you are behind a proxy, connections list may not match browsers activity"),
+            h(Alert, { severity: 'info', sx: { display: { xs: 'none', sm: 'inherit' }  } }, "如果您位于代理之后，连接列表可能与浏览器活动不匹配"),
         []))
     return h(Fragment, {},
         h(MoreInfo),
@@ -44,27 +44,27 @@ function MoreInfo() {
     const formatDuration = createDurationFormatter({ maxTokens: 2, skipZeroes: true })
     return element || h(Box, { sx: { display: 'flex', flexWrap: 'wrap', gap: { xs: .5, md: 1 }, mb: { xs: 1, sm: 2 } } },
         (allInfo || md) && pair('started', {
-            label: "Uptime",
+            label: "运行时长",
             render: x => formatDuration(Date.now() - +new Date(x)),
-            title: x => "Started: " + formatTimestamp(x),
+            title: x => "启动时间: " + formatTimestamp(x),
         }),
         (allInfo || sm) && pair('sent_got', {
-            render: x => ({ Sent: formatBytes(x[0]), Got: formatBytes(x[1]) }),
-            title: x => "Since: " + formatTimestamp(x[2]),
-            onDelete: () => confirmDialog("Reset stats?")
+            render: x => ({ 发送: formatBytes(x[0]), 接收: formatBytes(x[1]) }),
+            title: x => "自: " + formatTimestamp(x[2]),
+            onDelete: () => confirmDialog("重置统计？")
                 .then(yes => yes && apiCall('clear_persistent', { k: ['totalSent', 'totalGot'] })
-                    .then(() => alertDialog("Done", 'success'), alertDialog))
+                    .then(() => alertDialog("完成", 'success'), alertDialog))
         }),
-        pair('outSpeedKb', { label: "Output", render: formatSpeedK, minWidth: '8.5em' }),
-        pair('inSpeedKb', { label: "Input", render: formatSpeedK, minWidth: '8.5em' }),
-        (allInfo || sm) && pair('ips', { label: "IPs", title: () => stats && `${stats.connections.toLocaleString()} connections` }),
+        pair('outSpeedKb', { label: "输出", render: formatSpeedK, minWidth: '8.5em' }),
+        pair('inSpeedKb', { label: "输入", render: formatSpeedK, minWidth: '8.5em' }),
+        (allInfo || sm) && pair('ips', { label: "IPs", title: () => stats && `${stats.connections.toLocaleString()} 个连接` }),
         (md || allInfo || status?.http?.error) && pair('http', { label: "HTTP", render: port }),
         (md || allInfo || status?.https?.error) && pair('https', { label: "HTTPS", render: port }),
         (xl || allInfo) && pair('ram', { label: "RAM", render: formatBytes }),
         !xl && h(IconBtn, {
             size: 'small',
             icon: allInfo ? ChevronLeft : ChevronRight,
-            title: "Show more",
+            title: "显示更多",
             onClick: () => setAllInfo(x => !x)
         }),
     )
@@ -105,9 +105,9 @@ function MoreInfo() {
     }
 
     function port(v: any): ReturnType<Render> {
-        return v.listening ? ["port " + v.port, 'success']
+        return v.listening ? ["端口 " + v.port, 'success']
             : v.error ? [v.error, 'error']
-                : "off"
+                : "关闭"
     }
 
 }
@@ -121,7 +121,7 @@ function Connections() {
         (!monitorOnlyFiles ? list : list?.filter((x: any) => x.op)) ?? [],
         [!pause && list, monitorOnlyFiles]) //eslint-disable-line
     const logAble = useBreakpoint('md')
-    const [wantLog, wantLogButton] = useToggleButton("Show log", "Hide log", v => ({
+    const [wantLog, wantLogButton] = useToggleButton("显示日志", "隐藏日志", v => ({
         icon: History,
         sx: { rotate: v ? 0 : '180deg' },
     }), state.monitorWithLog)
@@ -134,11 +134,11 @@ function Connections() {
                     fullWidth: false,
                     value: monitorOnlyFiles,
                     onChange: v => state.monitorOnlyFiles = v,
-                    options: { "Show downloads+uploads": true, "Show all connections": false }
+                    options: { "仅显示下载/上传": true, "显示所有连接": false }
                 }),
             ),
             logAble && h(Flex, { flex: 1, justifyContent: 'space-between' },
-                wantLog ? "Live log" : h(Box),
+                wantLog ? "实时日志" : h(Box),
                 wantLogButton),
         ),
         h(Grid, { container: true, sx: { flex: 1 }, columnSpacing: 1 },
@@ -150,21 +150,21 @@ function Connections() {
                     rows,
                     getRowId: (row: any) => row.ip + ':' + row.port,
                     fillFlex: true,
-                    noRows: monitorOnlyFiles && "No downloads/uploads at the moment",
+                    noRows: monitorOnlyFiles && "当前没有下载/上传",
                     actionsHeader: pauseButton,
                     footerSide: () => h(Flex, {},
                         h(Btn, {
                             size: 'small',
                             icon: DisconnectIcon,
                             labelIf: 'xl',
-                            confirm: "Disconnecting all connections but localhost. Continue?",
-                            onClick: () => apiCall('disconnect', { allButLocalhost: true }).then(x => toast(`Disconnected: ${x.result}`))
-                        }, "Disconnect all")
+                            confirm: "将断开除 localhost 外的所有连接。继续？",
+                            onClick: () => apiCall('disconnect', { allButLocalhost: true }).then(x => toast(`已断开: ${x.result}`))
+                        }, "全部断开")
                     ),
                     columns: [
                         {
                             field: 'ip',
-                            headerName: "Address",
+                            headerName: "地址",
                             flex: 1,
                             maxWidth: 400,
                             renderCell: ({ row, value }) => ipForUrl(value) + ' :' + row.port,
@@ -176,18 +176,18 @@ function Connections() {
                         },
                         {
                             field: 'country',
-                            headerName: "Country",
+                            headerName: "国家/地区",
                             hideUnder: config.data?.[CFG.geo_enable] !== true || 'md',
                             renderCell: ({ value, row }) => h(Country, { code: value, ip: row.ip }),
                         },
                         {
-                            field: 'user',
-                            headerName: "User",
+                            field: '用户',
+                            headerName: "用户",
                             hideUnder: 'md',
                         },
                         {
                             field: 'started',
-                            headerName: "Started",
+                            headerName: "开始时间",
                             type: 'dateTime',
                             width: 96,
                             hideUnder: 'lg',
@@ -195,13 +195,13 @@ function Connections() {
                         },
                         {
                             field: 'path',
-                            headerName: "File",
+                            headerName: "文件",
                             flex: 1.5,
                             renderCell({ value, row }) {
                                 if (!value || !row.op) return
                                 const rowContentSx = { display: 'flex', alignItems: 'center', height: '100%', minWidth: 0, gap: 1 } as const
                                 if (row.op === 'browsing')
-                                    return h(Box, { sx: rowContentSx }, h(Box, {}, value, h(Box, { sx: { fontSize: 'x-small' } }, "browsing")))
+                                    return h(Box, { sx: rowContentSx }, h(Box, {}, value, h(Box, { sx: { fontSize: 'x-small' } }, "浏览中")))
                                 // keep icon and filename on the same row: datagrid v7 wraps cell content differently than before
                                 return h(Box, { sx: rowContentSx },
                                     h(IconProgress, {
@@ -224,7 +224,7 @@ function Connections() {
                         },
                         {
                             field: 'outSpeedKb',
-                            headerName: "Speed",
+                            headerName: "速度",
                             width: 110,
                             hideUnder: 'sm',
                             type: 'number',
@@ -233,14 +233,14 @@ function Connections() {
                         },
                         {
                             field: 'sent',
-                            headerName: "Sent",
+                            headerName: "已发送",
                             type: 'number',
                             hideUnder: 'md',
                             renderCell: ({ value, row }) => formatBytes(Math.max(value || 0, row.got || 0))
                         },
                         {
                             field: 'v',
-                            headerName: "Protocol",
+                            headerName: "协议",
                             align: 'center',
                             hideUnder: Infinity,
                             renderCell: ({ value, row }) => h(Fragment, {},
@@ -250,7 +250,7 @@ function Connections() {
                         },
                         {
                             field: 'agent',
-                            headerName: "Agent",
+                            headerName: "客户端",
                             hideUnder: 'lg',
                             renderCell: ({ value }) => agentIcons(value)
                         },
@@ -259,11 +259,11 @@ function Connections() {
                     actions: ({ row }) => [
                         h(IconBtn, {
                             icon: DisconnectIcon,
-                            title: "Disconnect",
+                            title: "断开",
                             doneMessage: true,
                             onClick: () => apiCall('disconnect', _.pick(row, ['ip', 'port'])).then(x => x.result > 0)
                         }),
-                        h(BlockIpBtn, { ip: row.ip, comment: "From monitoring", disabled: row.ip === props?.you }),
+                        h(BlockIpBtn, { ip: row.ip, comment: "来自监控", disabled: row.ip === props?.you }),
                     ]
                 }),
             ),

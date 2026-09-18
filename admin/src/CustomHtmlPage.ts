@@ -16,8 +16,8 @@ import { alertDialog } from './dialog'
 import { adminApis } from '../../src/adminApis'
 
 const names: any = {
-    top: "Top of HTML Body",
-    bottom: "Bottom of HTML Body",
+    top: "HTML 正文顶部",
+    bottom: "HTML 正文底部",
 }
 
 export default function CustomHtmlPage({ setTitleSide }: PageProps) {
@@ -45,16 +45,16 @@ export default function CustomHtmlPage({ setTitleSide }: PageProps) {
     const [enabled, setEnabled] = useState<boolean>()
     setTitleSide(useMemo(() => h(Box, { sx: { display: { xs: 'none', md: 'block' }  } },
         h(Alert, { severity: 'info' },
-            md("Add HTML code to some parts of the Front-end. It's saved to file `custom.html`, that you can edit directly with your editor of choice. "),
-            wikiLink('customization', "More help")
+            md("向前端的某些部分添加 HTML 代码。它会保存到 `custom.html` 文件中，你也可以用自己习惯的编辑器直接修改。 "),
+            wikiLink('customization', "更多帮助")
         ),
-        h(Alert, { severity: 'info' }, "To customize icons ", wikiLink('customization#icons', "read documentation") ),
+        h(Alert, { severity: 'info' }, "自定义图标请 ", wikiLink('customization#icons', "阅读文档") ),
     ), []))
     const saveShortcut = useCtrlShortcutButton(['s', 'Enter'])
     return element || h(Fragment, {},
         h(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1, mb: 1 } },
             h(SelectField as Field<string>, {
-                label: "Section",
+                label: "区域",
                 value: section,
                 options,
                 onChange: v => state.customHtmlSection = v
@@ -63,12 +63,12 @@ export default function CustomHtmlPage({ setTitleSide }: PageProps) {
             h(IconBtn, {
                 ref: saveShortcut.ref,
                 icon: Save,
-                title: "Save\n(ctrl+s)",
+                title: "保存\n(ctrl+s)",
                 modified: anyChange,
                 doneAnimation: true,
                 onClick: save,
             }),
-            hTooltip("Enable all sections", undefined, switchBtn(enabled, async v => {
+            hTooltip("启用所有区域", undefined, switchBtn(enabled, async v => {
                 try {
                     await apiCall('set_config', { values: { [CFG.disable_custom_html]: !v } })
                     setEnabled(v)

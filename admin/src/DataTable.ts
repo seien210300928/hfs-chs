@@ -2,7 +2,7 @@ import { DataGrid, DataGridProps, getGridStringOperators, GridColDef, GridFilter
     GridFooter, GridFooterContainer, gridClasses, GridLogicOperator, GridPanelContent, GridPanelFooter, GridPanelWrapper,
     GridValidRowModel, useGridApiContext, useGridApiRef, GridRenderCellParams, QuickFilter, QuickFilterControl,
     useGridRootProps } from '@mui/x-data-grid'
-import { enUS } from '@mui/x-data-grid/locales'
+import { zhCN } from '@mui/x-data-grid/locales'
 import { GridColumnHeaderFilterIconButton, type ColumnHeaderFilterIconButtonProps } from '@mui/x-data-grid/components'
 import { Alert, Box, BoxProps, Chip, LinearProgress, useTheme } from '@mui/material'
 import type { Breakpoint } from '@mui/material/styles'
@@ -60,7 +60,7 @@ export function DataTable({
     const [quickFilterOpen, setQuickFilterOpen] = useState(false)
     const [merged, setMerged] = useState(0)
     const manipulatedColumns = useMemo(() => {
-        const { localeText } = enUS.components.MuiDataGrid.defaultProps as any
+        const { localeText } = zhCN.components.MuiDataGrid.defaultProps as any
         const ret = onlyTruthy(columns.map(col => {
             if (!col) return
             const { type, sx } = col
@@ -74,7 +74,7 @@ export function DataTable({
                             const res = op.getApplyFilterFn(item, col)
                             return res && _.negate(res)
                         },
-                        label: "(not) " + (localeText['filterOperator' + _.upperFirst(op.value)] || op.value)
+                        label: "非" + (localeText['filterOperator' + _.upperFirst(op.value)] || op.value)
                     } satisfies typeof op
                 ])
             if (!col.mergeRender && !col.sx)
@@ -255,7 +255,7 @@ export function DataTable({
                 footer: { ...(effectiveSlotProps as any)?.footer, add: wrappedFooterSide },
                 noRowsOverlay: { ...(effectiveSlotProps as any)?.noRowsOverlay, initializing, noRows },
                 pagination: {
-                    labelRowsPerPage: "Rows",
+                    labelRowsPerPage: "每页行数",
                     ...!causingScrolling && {
                         showFirstButton: true,
                         showLastButton: true,
@@ -272,7 +272,7 @@ export function DataTable({
                 const visibleInList = merged + _.intersectionBy(showInDialog, apiRef.current!.getVisibleColumns(), 'field').length
                 if (showInDialog.length <= visibleInList) return // no need for dialog
                 newDialog({
-                    title: "Details",
+                    title: "详情",
                     onClose() {
                         displayingDetails.current = {}
                     },
@@ -335,7 +335,7 @@ export function DataTable({
     function renderActionsHeader(params: any) {
         return h(Box, { sx: { display: 'flex', width: '100%', justifyContent: 'center' }, onClick: stopPropagation, onKeyDown: stopPropagation },
             actionsHeader !== undefined ? callable(actionsHeader, params) : actionsProps?.renderHeader?.(params),
-            quickFilter && h(IconBtn, { icon: Search, title: "Search", size: 'small', onClick: () => setQuickFilterOpen(true) }))
+            quickFilter && h(IconBtn, { icon: Search, title: "搜索", size: 'small', onClick: () => setQuickFilterOpen(true) }))
 
         function stopPropagation(ev: SyntheticEvent) {
             // prevent header controls from triggering grid sorting or column interactions
@@ -359,7 +359,7 @@ export function DataTable({
     }
 
     async function saveFilterPreset() {
-        const name = (await promptDialog("Preset name"))?.trim()
+        const name = (await promptDialog("预设名称"))?.trim()
         if (!name) return
         persistFilterPresets({
             ...filterPresets,
@@ -458,11 +458,11 @@ function MultiFilterPanel({ model, onChange, presets, onSavePreset, onLoadPreset
             h(Box, { sx: { color: 'text.primary', fontWeight: 'bold' } }, "Filters"),
             h(rootProps.slots.baseIconButton, {
                 'aria-label': "Close",
-                title: "Close",
+                title: "关闭",
                 size: 'small',
                 onClick: () => apiRef.current.hideFilterPanel(),
             }, h(Close, { fontSize: 'small' })) ),
-        _.isEmpty(model.items) ? h(Box, { sx: { ml: 2, mb: 1, fontStyle: 'italic', color: 'text.primary' } }, "none")
+        _.isEmpty(model.items) ? h(Box, { sx: { ml: 2, mb: 1, fontStyle: 'italic', color: 'text.primary' } }, "无")
             : h(GridPanelContent, {}, model.items.map((item, index) =>
                 h(GridFilterForm, {
                     key: item.id ?? index,
@@ -491,8 +491,8 @@ function MultiFilterPanel({ model, onChange, presets, onSavePreset, onLoadPreset
                 onDelete: () => onDeletePreset?.(name),
             })) ),
         h(GridPanelFooter, { sx: { justifyContent: 'flex-end', gap: 1 } },
-            h(Button, { onClick: addFilter, startIcon: h(AddIcon, {}) }, "Add"),
-            presets && h(Button, { disabled: !activeFilters, onClick: onSavePreset, startIcon: h(Save, {}) }, "Save"),
+            h(Button, { onClick: addFilter, startIcon: h(AddIcon, {}) }, "添加"),
+            presets && h(Button, { disabled: !activeFilters, onClick: onSavePreset, startIcon: h(Save, {}) }, "保存"),
             model.items.length > 0 && h(Button, {
                 onClick() {
                     onChange({ ...model, items: [] }, 'removeAllFilterItems')
@@ -532,7 +532,7 @@ function DataTableQuickFilterToolbar({ onExpandedChange }: {
         }
     },
         h(QuickFilter, { expanded: true, debounceMs: 300, onExpandedChange },
-            h(QuickFilterControl as ElementType, { fullWidth: true, inputRef, size: 'small', placeholder: "Search" })))
+            h(QuickFilterControl as ElementType, { fullWidth: true, inputRef, size: 'small', placeholder: "搜索" })))
 }
 
 function CustomFooter({ add, ...props }: { add?: ReactNode }) {
@@ -540,7 +540,8 @@ function CustomFooter({ add, ...props }: { add?: ReactNode }) {
 }
 
 function NoRowsOverlay({ initializing, noRows }: { initializing?: boolean, noRows?: ReactNode }) {
-    return initializing ? null : h(Center, {}, noRows || "No entries")
+    return initializing ? null : h(Center, {}, noRows || "无记录")
 }
 
 // required in case of fillFlex:true
+

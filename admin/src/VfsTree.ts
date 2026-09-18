@@ -63,7 +63,7 @@ export default function VfsTree({ statusApi, isSideBreakpoint }:{ statusApi: Api
                     if (!from?.length) return
                     const movingCount = from.length
                     if (moveVfs(from, id))
-                        toast(`Moved ${movingCount} item(s) under "${id2vfsNode.get(id)?.name}"`, 'success')
+                        toast(`已将 ${movingCount} 个项目移动到 "${id2vfsNode.get(id)?.name}" 下`, 'success')
                 },
                 sx: {
                     display: 'flex',
@@ -80,21 +80,21 @@ export default function VfsTree({ statusApi, isSideBreakpoint }:{ statusApi: Api
                             display: 'grid', gridAutoFlow: 'column', gridTemplateRows: 'auto auto', height: '1em',
                         }
                     },
-                        node.can_delete != null && iconTooltip(Delete, "Delete permission"),
-                        node.can_upload != null && iconTooltip(Upload, "Upload permission"),
-                        !isRoot && !node.source && !node.url && iconTooltip(Cloud, "Virtual (no source)"),
-                        isRestricted(node.can_see) && iconTooltip(RemoveRedEye, "Restrictions on who can see"),
-                        isRestricted(node.can_read) && iconTooltip(Lock, "Restrictions on who can download"),
-                        node.default && iconTooltip(Web, "Show as web-page"),
-                        node.masks && iconTooltip(TheaterComedy, "Masks"),
-                        node.size === -1 && iconTooltip(HighlightOff, "Source not found"),
-                        rootFor && iconTooltip(Home, `home for ${rootFor}`)
+                        node.can_delete != null && iconTooltip(Delete, "删除权限"),
+                        node.can_upload != null && iconTooltip(Upload, "上传权限"),
+                        !isRoot && !node.source && !node.url && iconTooltip(Cloud, "虚拟（无来源）"),
+                        isRestricted(node.can_see) && iconTooltip(RemoveRedEye, "谁能看见的限制"),
+                        isRestricted(node.can_read) && iconTooltip(Lock, "谁能下载的限制"),
+                        node.default && iconTooltip(Web, "作为网页显示"),
+                        node.masks && iconTooltip(TheaterComedy, "掩码"),
+                        node.size === -1 && iconTooltip(HighlightOff, "未找到来源"),
+                        rootFor && iconTooltip(Home, `为 ${rootFor} 的主页`)
                     ),
                 ),
-                isRoot ? "Home folder" : name
+                isRoot ? "主页文件夹" : name
             ),
             itemId: id
-        }, with_(node.source && isFolder ? "files from " + node.source : !node.children?.length && isRoot && "nothing here", x =>
+        }, with_(node.source && isFolder ? "来自 " + node.source : !node.children?.length && isRoot && "此处为空", x =>
                 x && h(TreeItem, { itemId: SPECIAL_TREE_ITEM + id, label: h('i', {}, x) })),
             ...node.children?.map(x => h(Branch, { key: x.id, node: x })) || []
         )
@@ -117,7 +117,7 @@ export default function VfsTree({ statusApi, isSideBreakpoint }:{ statusApi: Api
         once = false
         state.expanded = initialExpansion
     }
-    const [_expandAll, toggleBtn] = useToggleButton("Collapse all", "Expand all", exp => ({
+    const [_expandAll, toggleBtn] = useToggleButton("全部折叠", "全部展开", exp => ({
         icon: exp ? UnfoldLess : UnfoldMore,
         sx: { rotate: exp ? 0 : '180deg' },
         onClick() {
@@ -135,7 +135,7 @@ export default function VfsTree({ statusApi, isSideBreakpoint }:{ statusApi: Api
     }, [first])
     return h(Flex, { flexDirection: 'column', alignItems: 'stretch', flex: 1 },
         h(Flex, { mb: 1, flexWrap: 'wrap', gap: [1, 2], mt: '2px' /*account for the save button's outline*/ },
-            h(Typography, { variant: 'h6' }, "Virtual File System"),
+            h(Typography, { variant: 'h6' }, "虚拟文件系统"),
             h(VfsMenuBar, { statusApi, add: toggleBtn, isSideBreakpoint }),
         ),
         vfs && h(SimpleTreeView, {
@@ -172,8 +172,8 @@ export default function VfsTree({ statusApi, isSideBreakpoint }:{ statusApi: Api
 }
 
 export function vfsNodeIcon(node: VfsNodeAdmin) {
-    return node.isRoot ? iconTooltip(Home, "home, or root if you like")
-        : node.type === 'folder' ? iconTooltip(FolderIcon, "Folder")
-            : node.url ? iconTooltip(Link, "Web-link")
-                : iconTooltip(FileIcon, "File")
+    return node.isRoot ? iconTooltip(Home, "主页（如果您愿意，也可以视为根目录）")
+        : node.type === 'folder' ? iconTooltip(FolderIcon, "文件夹")
+            : node.url ? iconTooltip(Link, "网页链接")
+                : iconTooltip(FileIcon, "文件")
 }

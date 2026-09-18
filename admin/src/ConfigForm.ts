@@ -46,7 +46,7 @@ export function ConfigForm<T=any>({ keys, form, saveOnChange, onSave, ...rest }:
             h(IconBtn, {
                 icon: RestartAlt,
                 disabled: !modified,
-                title: "Reset",
+                title: "重置",
                 onClick(){ setValues(config.data) }
             }),
             ...rest.addToBar||[],

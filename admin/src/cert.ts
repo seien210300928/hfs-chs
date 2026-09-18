@@ -18,24 +18,24 @@ export async function suggestMakingCert(onSaved?: (saved: object) => void) {
     return new Promise(resolve => {
         const { close } = newDialog({
             icon: CardMembership,
-            title: "Get a certificate",
+            title: "获取证书",
             onClose: resolve,
             Content: () => h(Box, { sx: { p: 1, lineHeight: 1.5 } },
-                h(Box, {}, "HTTPS needs a certificate to work."),
-                h(Box, {}, "We suggest you to ", h(InLink, { to: '/internet' }, "get a free but proper certificate"), '.'),
-                h(Box, {}, "If you don't have a domain ", h(LinkBtn, { onClick: makeCertAndSave }, "make a self-signed certificate"),
-                    " but that ", wikiLink('HTTPS#certificate', " won't be perfect"), '.' ),
+                h(Box, {}, "HTTPS 需要证书才能工作。"),
+                h(Box, {}, "我们建议您 ", h(InLink, { to: '/internet' }, "获取免费但正规的证书"), '。'),
+                h(Box, {}, "如果您没有域名 ", h(LinkBtn, { onClick: makeCertAndSave }, "创建自签名证书"),
+                    " 但这样做 ", wikiLink('HTTPS#certificate', "并非完美"), '。' ),
             )
         })
 
         async function makeCertAndSave() {
             if (!window.crypto.subtle)
-                return alertDialog("Retry this procedure on localhost", 'warning')
+                return alertDialog("请在 localhost 上重试此操作", 'warning')
             try {
                 const saved = await apiCall('make_self_signed_cert', { fileName: 'self' })
                 Object.assign(state.config, saved)
                 onSaved?.(saved)
-                await alertDialog("Certificate saved", 'success')
+                await alertDialog("证书已保存", 'success')
                 close()
             }
             catch(e) {

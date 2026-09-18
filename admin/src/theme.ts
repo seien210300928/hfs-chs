@@ -66,5 +66,5 @@ export function SwitchThemeBtn(props: BtnProps) {
             return state.darkTheme = darkDetected === v ? undefined : v
         },
         ...props,
-    }, currentlyDark ? "Light theme" : "Dark theme")
+    }, currentlyDark ? "浅色主题" : "深色主题")
 }

@@ -23,12 +23,12 @@ export default function OnlinePlugins() {
             onChange: setSearch as any,
             start: h(Search),
             typing: true,
-            label: "Search text"
+            label: "搜索文本"
         }),
         h(DataTable, {
             error: error && err2msg(xlate(error, PLUGIN_ERRORS)),
             rows: list.length ? list : [], // workaround for DataGrid bug causing 'no rows' message to be not displayed after 'loading' was also used
-            noRows: "No compatible plugins have been found",
+            noRows: "未找到兼容的插件",
             fillFlex: true,
             initializing,
             columnVisibilityModel: snap.onlinePluginsColumns,
@@ -36,7 +36,7 @@ export default function OnlinePlugins() {
             columns: [
                 {
                     field: 'id',
-                    headerName: "name",
+                    headerName: "名称",
                     flex: 1,
                     renderCell: renderPluginName,
                     mergeRender: { description: { sx: { fontSize: 'x-small' } } },
@@ -47,7 +47,7 @@ export default function OnlinePlugins() {
                 },
                 {
                     field: 'pushed_at',
-                    headerName: "last update",
+                    headerName: "最后更新",
                     valueGetter: (value) => new Date(value).toLocaleDateString(),
                 },
                 {
@@ -63,7 +63,7 @@ export default function OnlinePlugins() {
                 {
                     field: 'stargazers_count',
                     width: 50,
-                    headerName: "stars",
+                    headerName: "星标",
                     align: 'center',
                     hideUnder: 'sm',
                 },
@@ -71,9 +71,9 @@ export default function OnlinePlugins() {
             actions: ({ row, id }) => [
                 h(IconBtn, {
                     icon: Download,
-                    title: "Install",
+                    title: "安装",
                     progress: row.downloading,
-                    disabled: row.installed && "Already installed",
+                    disabled: row.installed && "已安装",
                     tooltipProps: { placement:'bottom-end' }, // workaround problem with horizontal scrolling by moving the tooltip leftward
                     onClick: () => installPluginFromResult(row)
                 }),

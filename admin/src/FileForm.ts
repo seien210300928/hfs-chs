@@ -65,12 +65,12 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
     const autoApply = isSideBreakpoint
     const barColors = useDialogBarColors()
     const actions = [
-        isDir && !isSideBreakpoint && h(AddVfsBtn, { variant: 'outlined' }, "Add"),
+        isDir && !isSideBreakpoint && h(AddVfsBtn, { variant: 'outlined' }, "添加"),
         !autoApply && h(VfsActionButtons, { files: [file], pasteTo: file, done }),
         ...wantArray(addToBar)
     ].filter(Boolean)
 
-    const needSourceWarning = !hasSource && h(Box as any, { sx: { color: 'warning.main' }, component: 'span' }, "Works only on folders with disk source! ")
+    const needSourceWarning = !hasSource && h(Box as any, { sx: { color: 'warning.main' }, component: 'span' }, "仅对具有磁盘源的文件夹生效！ ")
     const show: Record<keyof VfsPerms, boolean> = {
         can_read: !isLink,
         can_see: true,
@@ -96,7 +96,7 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
             addToBar: actions,
             save: {
                 ...propsForModifiedValues(isModifiedConfig(values, rest)),
-                children: "Apply",
+                children: "应用",
                 startIcon: h(Check),
                 async onClick() {
                     applyValues(values)
@@ -105,24 +105,24 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
             },
         },
         fields: [
-            isRoot ? h(Alert, { severity: 'info' }, "This is the Home folder, the root of your shared files. Options set here will be applied to all files.")
-                : isDir && hasSource && h(Alert, { severity: 'info' }, `To set permissions on individual items in folder, add them by clicking Add button, and then "from disk"`),
+            isRoot ? h(Alert, { severity: 'info' }, "这是主页文件夹，即您共享文件的根目录。此处设置的选项将应用于所有文件。")
+                : isDir && hasSource && h(Alert, { severity: 'info' }, `要为文件夹中的单个条目设置权限，请点击“添加”按钮，然后选择“来自磁盘的文件或文件夹”`),
             {
-                k: 'name', required: true, xl: true, helperText: hasSource && "You can decide a name that's different from the one on your disk",
-                ...isRoot && { disabled: true, value: "Home folder" },
+                k: 'name', required: true, xl: true, helperText: hasSource && "您可以指定一个与磁盘上不同的名称",
+                ...isRoot && { disabled: true, value: "主页文件夹" },
                 end: !isRoot && nameFromSource && !nameIsDerivedFromSource && h(Btn, {
-                    icon: RestartAlt, title: "Reset to same name on disk",
+                    icon: RestartAlt, title: "恢复为磁盘上的同名",
                     onClick: resetNameFromSource
                 }),
             },
-            isLink ? { k: 'url', label: "URL", lg: 12, xl: 8, required: true }
-                : { k: 'source', label: "Disk source", xl: true, comp: FileField, files: isUnknown || !isDir, folders: isUnknown || isDir,
-                    placeholder: "none",
-                    helperText: !values.source ? "If you enter a path here, its content will be listed. Leaving this empty, makes this folder fully virtual."
-                        : isDir ? "Files from this path on disk will be listed, but you can add more" : undefined,
+            isLink ? { k: 'url', label: "网址", lg: 12, xl: 8, required: true }
+                : { k: 'source', label: "磁盘源", xl: true, comp: FileField, files: isUnknown || !isDir, folders: isUnknown || isDir,
+                    placeholder: "无",
+                    helperText: !values.source ? "如果在此输入路径，其内容将被列出。留空则此文件夹完全虚拟。"
+                        : isDir ? "将列出磁盘上此路径的文件，但您还可以添加更多" : undefined,
             },
             { k: 'id', comp: LinkField, statusApi, xs: 12 },
-            { k: 'order', comp: NumberField, min: -1E5, max: 1E5, label: "Priority (order in the frontend)", placeholder: 'default', sm: 4, helperText: wikiLink('Virtual-file-system#order', "To force position") },
+            { k: 'order', comp: NumberField, min: -1E5, max: 1E5, label: "优先级（前端中的顺序）", placeholder: '默认', sm: 4, helperText: wikiLink('Virtual-file-system#order', "用于强制排序位置") },
             {
                 k: 'iconType',
                 comp: SelectField,
@@ -136,43 +136,43 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
                     comp: SelectField, // uniqBy to avoid same icon (with different names), but it works only on array, so first step is to convert the object
                     options: _.map(_.uniqBy(_.map(SYS_ICONS, (v,k) => [k, v[0], v[1] ?? k] as const), x => x[2]), ([k, emoji]) =>
                         ({ value: k, label: h(Flex, { gap: '.5em' }, hIcon(k), hIcon(emoji), ' ', k) }) ), // show both font-icon and emoji versions
-                    helperText: "The second icon is the fallback"
+                    helperText: "第二个图标为备用图标"
                 } : {
-                    label: "Icon file", placeholder: "default", comp: FileField, fileMask: IMAGE_FILEMASK,
+                    label: "图标文件", placeholder: "默认", comp: FileField, fileMask: IMAGE_FILEMASK,
                 }
             },
-            perm('can_read', "Who can see but not download will be asked to log in"),
-            perm('can_archive', "Should this be included when user downloads as ZIP"),
-            perm('can_list', "Permission to request the list of a folder. The list will include only things you can see.", { contentText: "subfolders" }),
-            perm('can_delete', [needSourceWarning, "Those who can delete can also rename and cut/move"]),
-            perm('can_upload', needSourceWarning, { contentText: "subfolders" }),
-            perm('can_see', ["See this item in the list. ", wikiLink('Permissions', "More help.")]),
+            perm('can_read', "能看见但不能下载的用户将被要求登录"),
+            perm('can_archive', "用户以 ZIP 下载时是否包含此条目"),
+            perm('can_list', "请求文件夹列表的权限。列表将只包含您能看见的内容。", { contentText: "子文件夹" }),
+            perm('can_delete', [needSourceWarning, "能删除的用户也可以重命名和剪切/移动"]),
+            perm('can_upload', needSourceWarning, { contentText: "子文件夹" }),
+            perm('can_see', ["在列表中可见该条目。 ", wikiLink('Permissions', "更多帮助。")]),
             isLink && {
                 k: 'target',
                 comp: BoolField,
                 sm: true,
-                label: "Open in new browser",
+                label: "在新浏览器中打开",
                 fromField: x => x ? '_blank' : null,
                 toField: x => x > '',
             },
             showSize && { k: 'size', comp: DisplayField, sm: 6, lg: 4, toField: formatBytes },
-            showTimestamps && { k: 'birthtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "Created", toField: formatTimestamp },
-            showTimestamps && { k: 'mtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "Modified", toField: formatTimestamp },
-            showAccept && { k: 'accept', label: "Accept on upload", placeholder: "anything", xl: showWebsite ? 4 : 12,
-                helperText: h('span', {}, "Not enforced, just hinting the browser. ", h(Link, { href: ACCEPT_LINK, target: '_blank' }, "Example: .zip")) },
+            showTimestamps && { k: 'birthtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "创建时间", toField: formatTimestamp },
+            showTimestamps && { k: 'mtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "修改时间", toField: formatTimestamp },
+            showAccept && { k: 'accept', label: "上传时接受", placeholder: "任意", xl: showWebsite ? 4 : 12,
+                helperText: h('span', {}, "仅提示浏览器，并不强制。 ", h(Link, { href: ACCEPT_LINK, target: '_blank' }, "示例: .zip")) },
             showWebsite && { k: 'default', comp: BoolField, xl: showAccept ? 8 : 12,
-                label: "Serve as web-page if index.html is found" + (inheritedDefault && values.default == null ? ' (inherited)' : ''),
+                label: "若找到 index.html 则作为网页提供" + (inheritedDefault && values.default == null ? '（继承）' : ''),
                 value: values.default ?? inheritedDefault,
                 toField: Boolean, fromField: (v:boolean) => v && !inheritedDefault ? 'index.html' : v ? null : false,
-                helperText: md("...instead of showing list of files")
+                helperText: md("...而不是显示文件列表")
             },
             { k: 'comment', multiline: true, xl: true },
             isDir && hasSource && { k: 'see_without_probing', comp: BoolField, xl: 6,
-                label: "Show without probing disk source", helperText: "Don't access this folder's disk source when listing its parent" },
+                label: "显示时不探测磁盘源", helperText: "列出其父项时不访问此文件夹的磁盘源" },
             isDir && { k: 'masks', multiline: true, xl: 6,
                 toField: yaml.stringify, fromField: v => v ? yaml.parse(v) : undefined,
                 comp: TextEditorField, lang: 'yaml',
-                helperText: ["Special field, leave empty unless you know what you are doing. YAML syntax. ", wikiLink('Masks-field', "(examples)")]
+                helperText: ["特殊字段，除非您清楚自己在做什么，否则请留空。YAML 语法。 ", wikiLink('Masks-field', "（示例）")]
             },
         ]
     })
@@ -193,7 +193,7 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
             k: perm, sm: 6, lg: 12, xl: 4,
             parent, accountsApi, helperText, isDir,
             otherPerms: others.map(x => ({ value: x, label: who2desc(x) })),
-            label: "Who can " + perm2word(perm),
+            label: "谁可以 " + perm2word(perm),
             inherit,
             byMasks: byMasks?.[perm],
             offerInheritance: true,
@@ -224,9 +224,9 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
     function applyValues(nextValues: typeof values) {
         const node = state.selectedFiles[0] || id2vfsNode.get(nextValues.id)
         if (!node)
-            throw Error("Selected node not found")
+            throw Error("未找到所选节点")
         const props = _.omit(nextValues, ['birthtime','mtime','size','id'])
-        if (!_.isEqual(nextValues, rest)) { // false is a meaningful permission, so lax config equality would discard "No one"
+        if (!_.isEqual(nextValues, rest)) { // false is a meaningful permission, so lax config equality would discard "无人"
             prepareVfsUndo()
             Object.assign(node, props)
             if (props.name !== undefined)
@@ -290,30 +290,30 @@ function LinkField({ value, statusApi }: LinkFieldProps) {
         }, link)
     ), [link])
     return h(Box, { sx: { display: 'flex' } },
-        !baseHost ? "Invalid baseUrl" : !urls ? 'error' : // check data is ok
+        !baseHost ? "无效的 baseUrl" : !urls ? 'error' : // check data is ok
         h(DisplayField, {
-            label: "Link",
+            label: "链接",
             className: MASK_IN_TESTS,
-            value: link || `outside of configured main address (${baseHost})`,
+            value: link || `在配置的主地址之外（${baseHost}）`,
             error,
             InputProps: link ? { inputComponent: RenderLink } : undefined,
             end: h(Box, {},
                 h(IconBtn, {
                     icon: ContentCopy,
-                    title: "Copy",
+                    title: "复制",
                     disabled: !link,
                     doneAnimation: true,
                     onClick: () => copyTextToClipboard(link)
                 }),
-                h(IconBtn, { icon: QrCode2, title: "QR Code", onClick: showQr, disabled: !link }),
-                h(IconBtn, { icon: Edit, title: "Change", onClick() { changeBaseUrl().then(reload) } }),
+                h(IconBtn, { icon: QrCode2, title: "二维码", onClick: showQr, disabled: !link }),
+                h(IconBtn, { icon: Edit, title: "修改", onClick() { changeBaseUrl().then(reload) } }),
             )
         }),
     )
 
     function showQr() {
         newDialog({
-            title: "QR Code",
+            title: "二维码",
             dialogProps: { sx: { bgcolor: 'background.default', border: '1px solid' } },
             Content() {
                 const theme = useTheme()

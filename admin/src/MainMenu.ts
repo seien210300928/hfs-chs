@@ -37,17 +37,17 @@ export interface MenuEntry {
 }
 
 export const mainMenu: MenuEntry[] = [
-    { path: '/', icon: Home, label: "Home", comp: HomePage },
-    { path: '/fs', icon: AccountTree, label: "Shared files", comp: VfsPage },
-    { path: '/accounts', icon: ManageAccounts, comp: AccountsPage },
+    { path: '/', icon: Home, label: "主页", comp: HomePage },
+    { path: '/fs', icon: AccountTree, label: "共享文件", comp: VfsPage },
+    { path: '/accounts', icon: ManageAccounts, label: "账户", comp: AccountsPage },
     { path: '/options', icon: Settings, comp: OptionsPage, subRoutes: true },
-    { path: '/internet', icon: Public, comp: InternetPage },
-    { path: '/monitoring', icon: Monitor, comp: MonitorPage, noPaddingOnMobile: true },
-    { path: '/logs', icon: History, comp: LogsPage, noPaddingOnMobile: true, subRoutes: true },
-    { path: '/language', icon: Translate, comp: LangPage },
-    { path: '/plugins', icon: Extension, comp: PluginsPage, noPaddingOnMobile: true, subRoutes: true },
-    { path: '/html', icon: Code, label: "Custom HTML", comp: CustomHtmlPage },
-    { path: '/logout', icon: Logout, comp: LogoutPage }
+    { path: '/internet', icon: Public, label: "网络", comp: InternetPage },
+    { path: '/monitoring', icon: Monitor, label: "监控", comp: MonitorPage, noPaddingOnMobile: true },
+    { path: '/logs', icon: History, label: "日志", comp: LogsPage, noPaddingOnMobile: true, subRoutes: true },
+    { path: '/language', icon: Translate, label: "语言", comp: LangPage },
+    { path: '/plugins', icon: Extension, label: "插件", comp: PluginsPage, noPaddingOnMobile: true, subRoutes: true },
+    { path: '/html', icon: Code, label: "自定义 HTML", comp: CustomHtmlPage },
+    { path: '/logout', icon: Logout, label: "退出登录", comp: LogoutPage }
 ]
 
 export default function Menu({ onSelect, itemTitle }: { onSelect: ()=>void, itemTitle: (idx: number) => string }) {
@@ -69,7 +69,7 @@ export default function Menu({ onSelect, itemTitle }: { onSelect: ()=>void, item
                 h(Box, {
                     sx: { color: 'primary.contrastText', fontSize: 'min(3rem, max(5vw, 4vh))', cursor: 'pointer' },
                     async onClick() {
-                        if (await confirmDialog("Open HFS website?"))
+                        if (await confirmDialog("打开 HFS 官网？"))
                             window.open(WEBSITE)
                     }
                 }, 'HFS'),

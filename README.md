@@ -1,6 +1,6 @@
 注意：
 * 本分支不会进行软件发布，若有需要需自行按照以下克隆流程编译
-* 编译前请确保你的计算机已经至少安装了 Node.js，推荐 22 版本
+* 编译前请确保你的计算机已经至少安装了 Node.js，推荐 24 版本
 
 1. 克隆本分支：`git clone git@github.com:seien210300928/hfs-chs.git && cd hfs-chs`
 2. Windows 必须让 npm 用 Git Bash 执行脚本（关键步骤；Linux/macOS 跳过）：

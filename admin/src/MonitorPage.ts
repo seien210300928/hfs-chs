@@ -57,7 +57,7 @@ function MoreInfo() {
         }),
         pair('outSpeedKb', { label: "输出", render: formatSpeedK, minWidth: '8.5em' }),
         pair('inSpeedKb', { label: "输入", render: formatSpeedK, minWidth: '8.5em' }),
-        (allInfo || sm) && pair('ips', { label: "IPs", title: () => stats && `${stats.connections.toLocaleString()} 个连接` }),
+        (allInfo || sm) && pair('ips', { label: "IP 数", title: () => stats && `${stats.connections.toLocaleString()} 个连接` }),
         (md || allInfo || status?.http?.error) && pair('http', { label: "HTTP", render: port }),
         (md || allInfo || status?.https?.error) && pair('https', { label: "HTTPS", render: port }),
         (xl || allInfo) && pair('ram', { label: "RAM", render: formatBytes }),

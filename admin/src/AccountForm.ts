@@ -117,12 +117,13 @@ export default function AccountForm({ account, done, groups, addToBar, reload }:
 
             { k: 'expire', label: "过期时间", sm: 6, lg: 4, comp: DateTimeField, toField: x => x && new Date(x),
                 helperText: "过期后将不允许登录" },
-            { k: 'days_to_live', sm: 6, lg: 4, comp: NumberField, step: 'any', min: 1/1000, // 10 minutes
+            { k: 'days_to_live', sm: 6, lg: 4, comp: NumberField, step: 'any', min: 1/1000, label: '有效天数', // 10 minutes
                 ...values.expire && { xs: 12, disabled: true, sx: { opacity: .2 } }, helperText: "用于在首次登录时设置过期时间" },
-            { k: 'notes', multiline: true, sm: 6, lg: 4 },
+            { k: 'notes', multiline: true, sm: 6, lg: 4, label: '备注' },
         ],
         onError: alertDialog,
         save: {
+            children: '保存',
             ...propsForModifiedValues(isModifiedConfig(values, account)),
             async onClick() {
                 const { password='', password2, adminActualAccess, hasPassword, invalidated, canLogin, members, ...withoutPassword } = values

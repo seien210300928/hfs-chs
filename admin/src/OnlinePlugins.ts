@@ -43,6 +43,7 @@ export default function OnlinePlugins() {
                 },
                 {
                     field: 'version',
+                    headerName: '版本',
                     width: 70,
                 },
                 {
@@ -52,6 +53,7 @@ export default function OnlinePlugins() {
                 },
                 {
                     field: 'license',
+                    headerName: '许可证',
                     width: 80,
                 },
                 themeField,

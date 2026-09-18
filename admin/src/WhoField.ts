@@ -12,7 +12,7 @@ import apiAccounts from '../../src/api.accounts'
 import _ from 'lodash'
 
 export function perm2word(perm: string) {
-    return xlate(perm.split('_')[1], { read: '下载', archive: '压缩', list: '访问列表' })
+    return xlate(perm.split('_')[1], { read: '下载', archive: '压缩', list: '访问列表', delete: '删除', upload: '上传', see: '查看' })
 }
 
 export type AccountsApi = ReturnType<typeof useAccountsApi>

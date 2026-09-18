@@ -190,6 +190,7 @@ export async function formDialog<T, RT=Partial<T>>(
                         },
                         save: props.save !== false && {
                             ...props.save,
+                            children: typeof props.save === 'object' ? props.save.children ?? '保存' : '保存',
                             onClick() {
                                 const { current: submitAction } = submitActionRef
                                 submitActionRef.current = undefined

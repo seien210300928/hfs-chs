@@ -35,6 +35,7 @@ export function ConfigForm<T=any>({ keys, form, saveOnChange, onSave, ...rest }:
             setValues((was: any) => ({ ...was, [k]: v }))
         },
         save: saveOnChange ? false : {
+            children: '保存',
             onClick: save,
             ...propsForModifiedValues(modified),
         },

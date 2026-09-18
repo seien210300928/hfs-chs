@@ -234,7 +234,7 @@ export function ArrayField<T extends object>({
 function ApplyButton(props: Parameters<typeof Button>[0]) {
     return h(Button, {
         ref: useCtrlShortcutButton(['s']).ref,
-        title: "Apply\n(ctrl+s)",
+        title: "应用\n(ctrl+s)",
         ...props,
     })
 }

@@ -40,7 +40,7 @@ export const mainMenu: MenuEntry[] = [
     { path: '/', icon: Home, label: "主页", comp: HomePage },
     { path: '/fs', icon: AccountTree, label: "共享文件", comp: VfsPage },
     { path: '/accounts', icon: ManageAccounts, label: "账户", comp: AccountsPage },
-    { path: '/options', icon: Settings, comp: OptionsPage, subRoutes: true },
+    { path: '/options', icon: Settings, label: '选项', comp: OptionsPage, subRoutes: true },
     { path: '/internet', icon: Public, label: "网络", comp: InternetPage },
     { path: '/monitoring', icon: Monitor, label: "监控", comp: MonitorPage, noPaddingOnMobile: true },
     { path: '/logs', icon: History, label: "日志", comp: LogsPage, noPaddingOnMobile: true, subRoutes: true },

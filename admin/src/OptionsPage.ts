@@ -114,6 +114,7 @@ export default function OptionsPage() {
         save: {
             ref: saveBtnRef,
             onClick: save,
+            children: '保存',
             ...propsForModifiedValues( Object.keys(changes).length>0),
         },
         barSx: { gap: 2 },
@@ -161,7 +162,7 @@ export default function OptionsPage() {
                 },
 
                 {
-                    k: CFG.listen_interface,
+                    k: CFG.listen_interface, label: '监听接口',
                     comp: SelectField,
                     sm: 4,
                     afterList: listenInterfaceOptions.some(x => x.disabled)
@@ -171,7 +172,7 @@ export default function OptionsPage() {
                 { k: CFG.max_kbps,        ...maxSpeedDefaults, sm: 4, label: "限制输出", helperText: "不适用于 localhost" },
                 { k: CFG.max_kbps_per_ip, ...maxSpeedDefaults, sm: 4, label: "按 IP 限制输出" },
 
-                { k : CFG.max_downloads, ...maxDownloadsDefaults, helperText: "同时下载的数量" },
+                { k : CFG.max_downloads, ...maxDownloadsDefaults, label: "最大下载数", helperText: "同时下载的数量" },
                 { k : CFG.max_downloads_per_ip, ...maxDownloadsDefaults, label: "每 IP 最大下载数" },
                 { k : CFG.max_downloads_per_account, ...maxDownloadsDefaults, label: "每账户最大下载数", helperText: "覆盖其他限制" },
 
@@ -187,9 +188,9 @@ export default function OptionsPage() {
                     error: proxyWarning(values, status),
                     helperText: "检测用户 IP 所必需"
                 },
-                { k: CFG.outbound_interface, comp: SelectField, xs: 6, md: 3,
+                { k: CFG.outbound_interface, comp: SelectField, xs: 6, md: 3, label: '出站接口',
                     options: [{ label: "自动", value: '' }, ...status?.ips?.map(value => ({ value })) || []] },
-                { k: CFG.outbound_proxy, xs: 6, md: 4, placeholder: "无", helperText: "URL 格式",
+                { k: CFG.outbound_proxy, xs: 6, md: 4, label: "出站代理", placeholder: "无", helperText: "URL 格式",
                     getError: x => try_(() => x && new URL(x) && '', () => "无效的 URL") },
                 { k: CFG.allowed_referer, comp: AllowedReferer, md: 2, placeholder: "任意", label: "来自其他网站的链接",
                     helperText: "当另一个网站链接了您的文件" },
@@ -201,7 +202,7 @@ export default function OptionsPage() {
                             $column: { mergeRender: { comment: {}, expire: {} } },
                             helperText: "小心不要把自己的 IP 也屏蔽掉，以免把自己踢出去",
                         },
-                        { k: 'expire', $type: 'dateTime', minDate: new Date(), sm: 6, $hideUnder: 'sm',
+                        { k: 'expire', $type: 'dateTime', label: '过期时间', minDate: new Date(), sm: 6, $hideUnder: 'sm',
                             helperText: "留空表示永不过期" },
                         {
                             k: 'disabled',
@@ -213,7 +214,7 @@ export default function OptionsPage() {
                             sm: 6,
                             $width: 80,
                         },
-                        { k: 'comment', $hideUnder: 'sm' },
+                        { k: 'comment', label: '备注', $hideUnder: 'sm' },
                     ],
                 },
             ],
@@ -228,14 +229,14 @@ export default function OptionsPage() {
                     label: "自动播放延迟秒数", helperText: md(`[显示界面](${REPO_URL}discussions/270) 的默认值`) },
                 { k: CFG.tile_size, comp: NumberField, xs: 6, sm: 3, max: MAX_TILE_SIZE, required: true,
                     label: "默认平铺大小", helperText: wikiLink('Tiles', "启用平铺模式") },
-                { k: CFG.theme, comp: SelectField, xs: 6, sm: 3, options: THEME_OPTIONS },
-                { k: CFG.sort_by, comp: SelectField, xs: 6, sm: 3, options: SORT_BY_OPTIONS },
+                { k: CFG.theme, comp: SelectField, xs: 6, sm: 3, label: '主题', options: _.map(THEME_OPTIONS, (v, k) => ({ label: ({ auto: '自动', light: '浅色', dark: '深色' } as Dict<string>)[k] ?? k, value: v })) },
+                { k: CFG.sort_by, comp: SelectField, xs: 6, sm: 3, label: '排序方式', options: _.map(SORT_BY_OPTIONS, v => ({ value: v, label: ({ name: '名称', extension: '扩展名', size: '大小', time: '修改时间', creation: '创建时间' } as Dict<string>)[v] ?? v })) },
 
                 { k: CFG.invert_order, comp: BoolField, xs: 6, md: 3, label: "反转排序" },
                 { k: CFG.folders_first, comp: BoolField, xs: 6, md: 3, label: "文件夹优先" },
                 { k: CFG.sort_numerics, comp: BoolField, xs: 6, md: 3, label: "数字名称按数值排序" },
                 { k: CFG.title_with_path, comp: BoolField, xs: 6, md: 3, label: "标题包含路径" },
-                { k: CFG.favicon, comp: FileField, placeholder: "无", fileMask: '*.ico|' + IMAGE_FILEMASK, xs: 12, sm: 6,
+                { k: CFG.favicon, comp: FileField, label: '网站图标', placeholder: "无", fileMask: '*.ico|' + IMAGE_FILEMASK, xs: 12, sm: 6,
                     helperText: "与您的网站关联的图标" },
                 { k: CFG.show_uploader, label: "上传者显示给", comp: WhoField, xs: true },
                 { k: CFG.page_size, comp: NumberField, xs: true, min: 1, required: true, label: "每页条目数", helperText: "每页显示的条目数" },
@@ -256,7 +257,7 @@ export default function OptionsPage() {
                 { k: CFG.show_hidden_files, comp: BoolField, sm: 3, label: "显示隐藏文件" },
                 { k: CFG.descript_ion_encoding, sm: 3, label: "DESCRIPT.ION 文件的编码", comp: SelectField, disabled: values[CFG.comments_storage] === 'attr',
                     options: ['utf8',720,775,819,850,852,862,869,874,808, ..._.range(1250,1257),10029,20866,21866] },
-                { k: CFG.comments_storage, comp: SelectField, xs: 12, sm: 6, options: {
+                { k: CFG.comments_storage, comp: SelectField, xs: 12, sm: 6, label: '评论存储', options: {
                         "保存在 DESCRIPT.ION 文件中": '',
                         "保存在文件属性中": 'attr',
                         "保存在文件属性中 + 加载 DESCRIPT.ION": 'attr+ion',
@@ -296,10 +297,10 @@ export default function OptionsPage() {
                     helperText: "仅强制登录一次。仅在前一选项不匹配时使用",
                 },
 
-                { k: CFG.server_code, comp: ArrayField, xs: 12,
+                { k: CFG.server_code, comp: ArrayField, xs: 12, label: '服务器代码',
                     fields: [
-                        { k: 'name', $width: 0.4, $render: ({ value }: any) => value.trim() || h('i', {}, "无名称") },
-                        { k: 'code', comp: TextEditorField, lang: 'js', $hideUnder: 'sm',
+                        { k: 'name', label: '名称', $width: 0.4, $render: ({ value }: any) => value.trim() || h('i', {}, "无名称") },
+                        { k: 'code', label: '代码', comp: TextEditorField, lang: 'js', $hideUnder: 'sm',
                             $render: ({ value }: any) => typeof value === 'string' ? h(Html, {}, highlight(value, languages.js, 'js')) : '?',
                             helperText: md(`此代码的工作方式类似于[插件](${REPO_URL}blob/main/dev-plugins.md)（有一些限制）`),
                         }

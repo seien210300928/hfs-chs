@@ -87,11 +87,11 @@ export default function InternetPage({ setTitleSide }: PageProps) {
                             _.map({
                                 NoIP: {
                                     url: 'https://$username:$password@dynupdate.no-ip.com/nic/update?hostname=$domain',
-                                    fields: ['username', 'password', 'domain'],
+                                    fields: [{ k: 'username', label: '用户名' }, { k: 'password', label: '密码' }, { k: 'domain', label: '域名' }],
                                 },
                                 DuckDNS: {
                                     url: 'https://www.duckdns.org/update/$domain/$token>OK',
-                                    fields: [{ k: 'domain', helperText: "不要包含 .duckdns.org 部分" }, 'token'],
+                                    fields: [{ k: 'domain', label: '域名', helperText: "不要包含 .duckdns.org 部分" }, { k: 'token', label: '令牌' }],
                                 }
                             }, ({ url, fields }, label) =>
                                 h(Btn, {
@@ -118,7 +118,7 @@ export default function InternetPage({ setTitleSide }: PageProps) {
 
     function geoBox() {
         const countryOptions = useMemo(() => COUNTRIES.map(x => ({ value: x.code, label: x.name })), [COUNTRIES])
-        return h(TitleCard, { title: "Geo IP", icon: Public },
+        return h(TitleCard, { title: "地理 IP", icon: Public },
             h(ConfigForm<{
                 [CFG.geo_enable]: boolean
                 [CFG.geo_allow]: null | boolean

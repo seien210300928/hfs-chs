@@ -108,7 +108,7 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
             isRoot ? h(Alert, { severity: 'info' }, "这是主页文件夹，即您共享文件的根目录。此处设置的选项将应用于所有文件。")
                 : isDir && hasSource && h(Alert, { severity: 'info' }, `要为文件夹中的单个条目设置权限，请点击“添加”按钮，然后选择“来自磁盘的文件或文件夹”`),
             {
-                k: 'name', required: true, xl: true, helperText: hasSource && "您可以指定一个与磁盘上不同的名称",
+                k: 'name', label: '名称', required: true, xl: true, helperText: hasSource && "您可以指定一个与磁盘上不同的名称",
                 ...isRoot && { disabled: true, value: "主页文件夹" },
                 end: !isRoot && nameFromSource && !nameIsDerivedFromSource && h(Btn, {
                     icon: RestartAlt, title: "恢复为磁盘上的同名",
@@ -124,14 +124,14 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
             { k: 'id', comp: LinkField, statusApi, xs: 12 },
             { k: 'order', comp: NumberField, min: -1E5, max: 1E5, label: "优先级（前端中的顺序）", placeholder: '默认', sm: 4, helperText: wikiLink('Virtual-file-system#order', "用于强制排序位置") },
             {
-                k: 'iconType',
+                k: 'iconType', label: '图标类型',
                 comp: SelectField,
-                options: ['default', 'file', 'embedded'],
+                options: [{ value: 'default', label: '默认' }, { value: 'file', label: '文件图标' }, { value: 'embedded', label: '内嵌图标' }],
                 value: !values.icon ? 'default' : embeddedIcon ? 'embedded' : 'file',
                 xs: true,
                 sm: defaultIcon ? 8 : true,
             },
-            !defaultIcon && { k: 'icon', xs: 8, sm: 4,
+            !defaultIcon && { k: 'icon', xs: 8, sm: 4, label: '图标',
                 ...embeddedIcon ? {
                     comp: SelectField, // uniqBy to avoid same icon (with different names), but it works only on array, so first step is to convert the object
                     options: _.map(_.uniqBy(_.map(SYS_ICONS, (v,k) => [k, v[0], v[1] ?? k] as const), x => x[2]), ([k, emoji]) =>
@@ -155,7 +155,7 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
                 fromField: x => x ? '_blank' : null,
                 toField: x => x > '',
             },
-            showSize && { k: 'size', comp: DisplayField, sm: 6, lg: 4, toField: formatBytes },
+            showSize && { k: 'size', label: '大小', comp: DisplayField, sm: 6, lg: 4, toField: formatBytes },
             showTimestamps && { k: 'birthtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "创建时间", toField: formatTimestamp },
             showTimestamps && { k: 'mtime', comp: DisplayField, sm: 6, lg: showSize && 4, label: "修改时间", toField: formatTimestamp },
             showAccept && { k: 'accept', label: "上传时接受", placeholder: "任意", xl: showWebsite ? 4 : 12,
@@ -166,10 +166,10 @@ export default function FileForm({ file, addToBar, statusApi, accountsApi, done,
                 toField: Boolean, fromField: (v:boolean) => v && !inheritedDefault ? 'index.html' : v ? null : false,
                 helperText: md("...而不是显示文件列表")
             },
-            { k: 'comment', multiline: true, xl: true },
+            { k: 'comment', multiline: true, xl: true, label: '备注' },
             isDir && hasSource && { k: 'see_without_probing', comp: BoolField, xl: 6,
                 label: "显示时不探测磁盘源", helperText: "列出其父项时不访问此文件夹的磁盘源" },
-            isDir && { k: 'masks', multiline: true, xl: 6,
+            isDir && { k: 'masks', multiline: true, xl: 6, label: '掩码',
                 toField: yaml.stringify, fromField: v => v ? yaml.parse(v) : undefined,
                 comp: TextEditorField, lang: 'yaml',
                 helperText: ["特殊字段，除非您清楚自己在做什么，否则请留空。YAML 语法。 ", wikiLink('Masks-field', "（示例）")]

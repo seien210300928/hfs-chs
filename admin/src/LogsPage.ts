@@ -31,7 +31,7 @@ const logLabels = {
     error_log: "失败",
     console: "控制台",
     disconnections: "断开连接",
-    ips: "IPs",
+    ips: "IP 地址",
 }
 const LOG_FILES = typedKeys(logLabels)
 

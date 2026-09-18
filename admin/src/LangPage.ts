@@ -35,16 +35,19 @@ export default function LangPage({ setTitleSide }: PageProps) {
                 columns: [
                     {
                         field: 'code',
+                        headerName: '代码',
                         width: 110,
                         valueFormatter: (value: string | undefined) => value?.toUpperCase(),
                     },
                     {
                         field: 'version',
+                        headerName: '版本',
                         width: 120,
                         hideUnder: 'sm',
                     },
                     {
                         field: 'author',
+                        headerName: '作者',
                         flex: 1,
                         hideUnder: 'sm',
                     }

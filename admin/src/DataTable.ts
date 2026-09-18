@@ -226,6 +226,7 @@ export function DataTable({
                 sx: { position: 'absolute', width: 'calc(100% - 2px)', borderRadius: 1, m: '1px 1px' }
             }) ),
         h(DataGrid, {
+            localeText: zhCN.components.MuiDataGrid.defaultProps.localeText,
             initialState: gridInitialState,
             density: compact ? 'compact' : 'standard',
             columns: manipulatedColumns,

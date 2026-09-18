@@ -60,6 +60,7 @@ export default function InstalledPlugins({ updates }: { updates?: true }) {
             },
             {
                 field: 'version',
+                headerName: '版本',
                 width: 70,
                 hideUnder: 'sm',
                 cellInnerProps: { className: HIDE_IN_TESTS },
@@ -168,6 +169,7 @@ function getSingleConfig(k: string) {
 
 export const descriptionField: DataTableColumn = {
     field: 'description',
+    headerName: '描述',
     mergeRender: { isTheme: {} } ,
     mergeRenderSx: { float: 'left' },
 }

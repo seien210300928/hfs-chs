@@ -1,0 +1,11 @@
+/* folder-size plugin: counts before the size */
+.entry-details .fs-counts {
+    display: inline;
+}
+.entry-details .fs-counts::after {
+    content: var(--separator, " - ");
+}
+/* keep the dimmed look of the rest of the entry-details */
+.entry-details .fs-counts {
+    opacity: .85;
+}
